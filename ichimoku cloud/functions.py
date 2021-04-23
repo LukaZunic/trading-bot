@@ -277,3 +277,75 @@ def macd_buy_sell(end, data, hodling):
             hodling=True
     else:
         print("Still watching the trend. Nothing to trade atm!")
+
+def plot_bollinger_macd(data):
+    fig = go.Figure()
+
+    fig.add_trace(go.Candlestick(
+                x=data.index,
+                open=data['Open'],
+                high=data['High'],
+                low=data['Low'],
+                close=data['Close'],
+                name = 'Market Data'
+        )
+    )
+
+    fig.add_trace(go.Scatter(
+        x=data.index,
+        y=data['macd'],
+        line=dict(
+            color='purple',
+            width=.8
+        ),
+        name = 'MACD line'
+        )
+    )
+
+    fig.add_trace(go.Scatter(
+        x=data.index,
+        y=data['signal_line'],
+        line=dict(
+            color='green',
+            width=.8
+        ),
+        name = 'Signal Line'
+        )
+    )
+    fig.add_trace(go.Scatter(
+        x=data.index,
+        y=data['upper_band'],
+        line=dict(
+            color='blue',
+            width=.8
+        ),
+        name = 'Upper Bollinger Band'
+        )
+    )
+
+    fig.add_trace(go.Scatter(
+        x=data.index,
+        y=data['lower_band'],
+        line=dict(
+            color='red',
+            width=.8
+        ),
+        name = 'Lower Bollinger Band'#,
+        #fill = 'tonexty',
+        #fillcolor= 'grey',
+        #alpha=0.00001
+        )
+    )
+    fig.add_trace(go.Scatter(
+        x=data.index,
+        y=data['MA_20'],
+        line=dict(
+            color='black',
+            width=.8
+        ),
+        name = 'Moving average 20 period'
+        )
+    )
+
+    fig.show()
+    fig.write_html("./bollinger-macd.html")
