@@ -99,7 +99,7 @@ def plot_ichimoku(data):
 
 
     fig.show()
-    fig.write_html("./ichimoku.html") 
+    fig.write_html("./ichimoku.html") #za laksi preview na netu
 
 def get_last_date(end):
     last_date = end
@@ -213,8 +213,8 @@ def plot_bollinger(data):
     
 
     fig.show()
-    fig.write_html("./bollinger.html") 
-    
+    fig.write_html("./bollinger.html")
+
 def plot_macd(data):
     fig = go.Figure()
 
@@ -232,7 +232,7 @@ def plot_macd(data):
         x=data.index,
         y=data['macd'],
         line=dict(
-            color='brown',
+            color='purple',
             width=.8
         ),
         name = 'MACD line'
@@ -243,7 +243,7 @@ def plot_macd(data):
         x=data.index,
         y=data['signal_line'],
         line=dict(
-            color='yellow',
+            color='green',
             width=.8
         ),
         name = 'Signal Line'

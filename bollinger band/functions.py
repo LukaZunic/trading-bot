@@ -213,8 +213,8 @@ def plot_bollinger(data):
     
 
     fig.show()
-    fig.write_html("./bollinger.html") 
-    
+    fig.write_html("./bollinger.html")
+
 def plot_macd(data):
     fig = go.Figure()
 
