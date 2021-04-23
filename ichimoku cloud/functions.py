@@ -132,7 +132,7 @@ def get_last_date(end):
     last_date_with_value = str('20' + year + '-' + month + '-' + day)
     return last_date_with_value
 
-def ichimoto_cloud_buy_sell(curr_open_price, curr_span_a, curr_span_b, curr_kijun, curr_tenkan, hodling):
+def ichimoku_cloud_buy_sell(curr_open_price, curr_span_a, curr_span_b, curr_kijun, curr_tenkan, hodling):
     if curr_open_price > curr_span_a and curr_open_price > curr_span_b:
         if abs(curr_kijun-curr_tenkan) >= 0 and abs(curr_kijun-curr_tenkan) <= 2.5:
             print("BUUUUY!!!")
