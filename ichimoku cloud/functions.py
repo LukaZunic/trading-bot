@@ -99,7 +99,7 @@ def plot_ichimoku(data):
 
 
     fig.show()
-    fig.write_html("./ichimoku.html") 
+    fig.write_html("./ichimoku.html") #za laksi preview na netu
 
 def get_last_date(end):
     last_date = end
@@ -132,19 +132,21 @@ def get_last_date(end):
     last_date_with_value = str('20' + year + '-' + month + '-' + day)
     return last_date_with_value
 
-def ichimoku_cloud_buy_sell(curr_open_price, curr_span_a, curr_span_b, curr_kijun, curr_tenkan, hodling):
-    if curr_open_price > curr_span_a and curr_open_price > curr_span_b:
+def ichimoku_cloud_buy_sell(curr_close_price, curr_span_a, curr_span_b, curr_kijun, curr_tenkan, hodling):
+    if curr_close_price > curr_span_a and curr_close_price > curr_span_b:
         if abs(curr_kijun-curr_tenkan) >= 0 and abs(curr_kijun-curr_tenkan) <= 2.5:
             print("BUUUUY!!!")
+            print('Bought at the price of:',curr_close_price,'$')
             #INSERT BUYING CODE HERE
             hodling = True
         else:
             print("Watch for conversion and base line! Might buy soon!")
     else:
         if hodling==True:
-            if curr_open_price < curr_span_a and curr_open_price < curr_span_b:
+            if curr_close_price < curr_span_a and curr_close_price < curr_span_b:
                 if abs(curr_kijun-curr_tenkan) >= 0 and abs(curr_kijun-curr_tenkan) <= 2.5:
                     print("SEEEELLL!!!!")
+                    print('Sold at the price of:',curr_close_price,'$')
                     #INSERT SELLING CODE HERE
                     hodling=False
                 else:
@@ -156,12 +158,12 @@ def ichimoku_cloud_buy_sell(curr_open_price, curr_span_a, curr_span_b, curr_kiju
 
 
 def get_latest_data(data, last_date_with_value):
-    curr_open_price = data.loc[last_date_with_value]['Open']
+    curr_close_price = data.loc[last_date_with_value]['Close']
     curr_span_a = data.loc[last_date_with_value]['senkou_span_A']
     curr_span_b = data.loc[last_date_with_value]['senkou_span_B']
     curr_kijun = data.loc[last_date_with_value]['kijun_sen']
     curr_tenkan = data.loc[last_date_with_value]['tenkan_sen']
-    return curr_open_price, curr_span_a, curr_span_b, curr_kijun, curr_tenkan
+    return curr_close_price, curr_span_a, curr_span_b, curr_kijun, curr_tenkan
 
 def plot_bollinger(data):
     fig = go.Figure()
@@ -213,8 +215,8 @@ def plot_bollinger(data):
     
 
     fig.show()
-    fig.write_html("./bollinger.html") 
-    
+    fig.write_html("./bollinger.html")
+
 def plot_macd(data):
     fig = go.Figure()
 
@@ -232,7 +234,7 @@ def plot_macd(data):
         x=data.index,
         y=data['macd'],
         line=dict(
-            color='brown',
+            color='purple',
             width=.8
         ),
         name = 'MACD line'
@@ -243,7 +245,7 @@ def plot_macd(data):
         x=data.index,
         y=data['signal_line'],
         line=dict(
-            color='yellow',
+            color='green',
             width=.8
         ),
         name = 'Signal Line'
@@ -251,4 +253,27 @@ def plot_macd(data):
     )
 
     fig.show()
-    fig.write_html("./macd.html") 
+    fig.write_html("./macd.html")
+
+def macd_buy_sell(end, data, hodling):
+    last_date = get_last_date(end)
+    date_before_last = get_last_date(last_date)
+    curr_macd_line = data.loc[last_date]['macd']
+    curr_signal_line = data.loc[last_date]['signal_line']
+    curr_close = data.loc[last_date]['Close']
+    prev_macd_line = data.loc[date_before_last]['macd']
+    prev_signal_line = data.loc[date_before_last]['signal_line']
+    if prev_macd_line == prev_signal_line or abs(prev_macd_line - prev_signal_line) < 0.5:
+        if curr_macd_line < curr_signal_line:
+            if hodling==True:
+                print("SEEEELLL!!!!")
+                print('Sold at the price of:',curr_close,'$')
+                #INSERT SELL CODE HERE
+                hodling=False
+        else:
+            print("BUUUUUYY!!!!")
+            print('Bought at the price of:',curr_close,'$')
+            #INSERT BUYING CODE HERE
+            hodling=True
+    else:
+        print("Still watching the trend. Nothing to trade atm!")
