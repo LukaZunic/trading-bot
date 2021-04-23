@@ -99,7 +99,7 @@ def plot_ichimoku(data):
 
 
     fig.show()
-    fig.write_html("./ichimoku.html") #za laksi preview na netu
+    fig.write_html("./ichimoku.html")
 
 def get_last_date(end):
     last_date = end
@@ -196,10 +196,7 @@ def plot_bollinger(data):
             color='red',
             width=.8
         ),
-        name = 'Lower Bollinger Band'#,
-        #fill = 'tonexty',
-        #fillcolor= 'grey',
-        #alpha=0.00001
+        name = 'Lower Bollinger Band'
         )
     )
     fig.add_trace(go.Scatter(
@@ -330,10 +327,7 @@ def plot_bollinger_macd(data):
             color='red',
             width=.8
         ),
-        name = 'Lower Bollinger Band'#,
-        #fill = 'tonexty',
-        #fillcolor= 'grey',
-        #alpha=0.00001
+        name = 'Lower Bollinger Band'
         )
     )
     fig.add_trace(go.Scatter(
@@ -349,3 +343,41 @@ def plot_bollinger_macd(data):
 
     fig.show()
     fig.write_html("./bollinger-macd.html")
+
+
+def macd_buy_sell_check(data,end,hodling):
+    last_date = get_last_date(end)
+    date_before_last = get_last_date(last_date)
+    curr_macd_line = data.loc[last_date]['macd']
+    curr_signal_line = data.loc[last_date]['signal_line']
+    prev_macd_line = data.loc[date_before_last]['macd']
+    prev_signal_line = data.loc[date_before_last]['signal_line']
+    if prev_macd_line == prev_signal_line or abs(prev_macd_line - prev_signal_line) < 0.5:
+        if curr_macd_line < curr_signal_line:
+                return 'Sell'
+        else:
+            return 'Buy'
+    else:
+        return 'Wait'
+
+def bollinger_macd_buy_sell(data, end, hodling):
+    check_macd = macd_buy_sell_check(data, end, hodling)
+    last_date = get_last_date(end)
+    distance = abs(data.loc[last_date]['upper_band'] - data.loc[last_date]['lower_band'])
+    if check_macd == 'Buy':
+        if data.loc[last_date]['Close'] > data.loc[last_date]['lower_band'] and data.loc[last_date]['Close'] < ((distance/4)+data.loc[last_date]['lower_band']):
+            print("BUUUUYYY!!!!")
+            #INSERT CODE TO BUY
+            hodling = True
+        else:
+            print("MACD says buy, but must waiting for BB confirmation!")
+    elif check_macd == 'Sell':
+        if data.loc[last_date]['Close'] < data.loc[last_date]['upper_band'] and data.loc[last_date]['Close'] < ((distance/4)-data.loc[last_date]['lower_band']):
+            if hodling == True:
+                print("SEEELLLL!!!!")
+                #INSERT CODE TO SELL
+                hodling = False
+            else:
+                print("U dont own any coins/stocks atm to sell!")
+    else:
+        print('Wait, still speculating!')
