@@ -149,9 +149,10 @@ def ichimoku_cloud_buy_sell(name, curr_close_price, curr_span_a, curr_span_b, cu
                     "type":"BUY",
                     "name": name,
                     "quantity": str(float(get_wallet_balance())/curr_close_price),
-                    "price":float(curr_close_price)
+                    "price":float(curr_close_price),
+                    "method": "ICHIMOKU CLOUD"
             })
-            buying_rebalance(curr_close_price, str(float(get_wallet_balance())/curr_close_price))
+            buying_rebalance(curr_close_price, str(float(get_wallet_balance())/curr_close_price), "ICHIMOKU CLOUD")
             print(r.json())
             hodling = True
         else:
@@ -169,9 +170,10 @@ def ichimoku_cloud_buy_sell(name, curr_close_price, curr_span_a, curr_span_b, cu
                             "type":"SELL",
                             "name": name,
                             "quantity": str(quantity),
-                            "price": float(curr_close_price)
+                            "price": float(curr_close_price),
+                            "method": "ICHIMOKU CLOUD"
                     })
-                    selling_rebalance(str(float(quantity)*float(curr_close_price)))
+                    selling_rebalance(str(float(quantity)*float(curr_close_price)),"ICHIMOKU CLOUD")
                     hodling=False
                 else:
                     print("Watch for conversion and base line! Might sell soon!")
@@ -404,25 +406,25 @@ def bollinger_macd_buy_sell(data, end, hodling):
     else:
         print('Wait, still speculating!')
 
-def create_wallet(name, balance):
-    requests.post('http://localhost:3014/api/createWallet', json={"name":name,"balance":balance})
+def create_wallet(name, balance, method):
+    requests.post('http://localhost:3014/api/createWallet', json={"name":name,"balance":balance,"method":method})
 
 def get_wallet_balance():
     r = requests.post('http://localhost:3014/api/getWallet', json={})
     return r.json()['data'][0]['balance']
 
-def buying_rebalance(buying_price, quantity):
+def buying_rebalance(buying_price, quantity, method):
     balance = float(get_wallet_balance())
     rebalance1 = balance/buying_price
     rebalance = float(balance - (rebalance1*float(buying_price)))
     if rebalance < 1:
         rebalance = "0"
-    requests.post('http://localhost:3014/api/rebalance', json={"rebalance": rebalance, "quantity":quantity})
+    requests.post('http://localhost:3014/api/rebalance', json={"rebalance": rebalance, "quantity":quantity, "method":method})
 
-def selling_rebalance(revenue):
+def selling_rebalance(revenue, method):
     balance = get_wallet_balance()
     rebalance = float(balance) + float(revenue)
-    requests.post('http://localhost:3014/api/rebalance', json={"rebalance": rebalance, "quantity":"0"})
+    requests.post('http://localhost:3014/api/rebalance', json={"rebalance": rebalance, "quantity":"0", "method":method})
 
 def get_wallet_quantity():
     r = requests.post('http://localhost:3014/api/getWallet', json={})
