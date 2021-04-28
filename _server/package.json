@@ -1,7 +1,7 @@
 {
   "name": "server",
   "version": "1.0.0",
-  "description": "restoran lu",
+  "description": "tradingbot",
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "\u0016https://github.com/zavovkci/Restoran"
+    "url": ""
   },
   "author": "Dario Zavišić",
   "license": "ISC",

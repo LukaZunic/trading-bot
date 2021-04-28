@@ -11,10 +11,10 @@ function Connection() {
     this.init = function() {
       this.pool = mysql.createPool({
         connectionLimit: 250, // privremeno jer blokira slanje zahtjeva na APi nakon toliko puta (mozda je problem u proceduri)
-        host: '192.168.8.115',
-        user: 'admin10',
-        password: 'movema10',
-        database: 'regulator'
+        host: '',
+        user: '',
+        password: '',
+        database: ''
       });
     };
   }else{
