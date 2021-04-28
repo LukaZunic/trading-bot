@@ -1,7 +1,7 @@
 {
   "name": "server",
   "version": "1.0.0",
-  "description": "tradingbot",
+  "description": "restoran lu",
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": ""
+    "url": "\u0016https://github.com/zavovkci/Restoran"
   },
   "author": "Dario Zavišić",
   "license": "ISC",
@@ -17,6 +17,7 @@
     "api-token": "^0.1.1",
     "bcrypt": "^5.0.0",
     "body-parser": "^1.19.0",
+    "child_process": "^1.0.2",
     "config": "^3.3.3",
     "cors": "^2.8.5",
     "express": "^4.17.1",
@@ -27,6 +28,8 @@
     "mysql": "^2.18.1",
     "nodemon": "^2.0.7",
     "password-hash": "^1.2.2",
+    "path": "^0.12.7",
+    "python-shell": "^3.0.0",
     "util.promisify": "^1.1.1"
   }
 }

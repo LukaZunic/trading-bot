@@ -3,6 +3,8 @@ var apiToken    = require('api-token');
 var pool        = require('../connection');
 var functions    = require('./functions.js');
 
+
+
 var wallet = {
     createWallet: (req, res, next) => {
         try{
@@ -13,6 +15,7 @@ var wallet = {
                 functions.mysql_queryV2(query, function(dataSent){
                     functions.sendRes(res, dataSent);
                 });
+                
             }else{
                 functions.sendRes(res,{ success: false, message: 'Error, please check the passed data.!', status: 502, data:[]});
             }

@@ -1,2 +1,2 @@
-# Server for trading-bot
-
+# Restoran
+Project for Web programming.
