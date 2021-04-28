@@ -10,7 +10,7 @@ var apiToken    = require('api-token');
 var connection  = require('./connection');
 var functions   = require('./routes/functions.js');
 var helmet      = require('helmet');
-const { stringify } = require('querystring');
+var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 
 var apiRoutes = express.Router();
 
@@ -62,26 +62,29 @@ app.get('/', function(req, res){
     res.json({ message: 'API'});
 });
 
-app.get('/macd', function(req, res){
-    const { spawn } = require('child_process');
+app.post('/macd', function(req, res){
+    setTimeout(()=>{
+        const { spawn } = require('child_process');
 
-    var pip_prerequirments = ['-m pip install sys','-m pip install numpy','-m pip install pandas','-m pip install yfinance','-m pip install requests','-m pip install datetime', '-m pip install plotly']
-
-    const childPython = spawn('py', ['./scripts/macd.py',req.body.name,req.body.start_date]);
-
-    childPython.stdout.on('data', (data) => {
-        console.log(`stdout: ${data}`);
-    });
-    childPython.stderr.on('data', (data) => {
-        console.log(`stderr: ${data}`);
-    });
-    childPython.on('close', (code) => {
-        console.log(`child process exited with code: ${code}`);
-    });
-    res.json({ message: 'MACD called'});
+        var pip_prerequirments = ['-m pip install sys','-m pip install numpy','-m pip install pandas','-m pip install yfinance','-m pip install requests','-m pip install datetime', '-m pip install plotly']
+    
+        const childPython = spawn('py', ['./scripts/macd.py',req.body.name,req.body.start_date]);
+    
+        childPython.stdout.on('data', (data) => {
+            console.log(`stdout: ${data}`);
+        });
+        childPython.stderr.on('data', (data) => {
+            console.log(`stderr: ${data}`);
+        });
+        childPython.on('close', (code) => {
+            console.log(`child process exited with code: ${code}`);
+        });
+        res.json({ message: 'MACD called'});
+    },2000)
+    
 });
 
-app.get('/ichimoku', function(req, res){
+app.post('/ichimoku', function(req, res){
     const { spawn } = require('child_process');
 
     var pip_prerequirments = ['-m pip install sys','-m pip install numpy','-m pip install pandas','-m pip install yfinance','-m pip install requests','-m pip install datetime', '-m pip install plotly']
@@ -100,7 +103,7 @@ app.get('/ichimoku', function(req, res){
     res.json({ message: 'ICHIMOKU called'});
 });
 
-app.get('/ichimokuBollinger', function(req, res){
+app.post('/ichimokuBollinger', function(req, res){
     const { spawn } = require('child_process');
 
     var pip_prerequirments = ['-m pip install sys','-m pip install numpy','-m pip install pandas','-m pip install yfinance','-m pip install requests','-m pip install datetime', '-m pip install plotly']
@@ -117,6 +120,25 @@ app.get('/ichimokuBollinger', function(req, res){
         console.log(`child process exited with code: ${code}`);
     });
     res.json({ message: 'ICHIMOKU + BOLLINGER BANDS called'});
+});
+
+
+app.post('/startMACD', function(req, res){
+    name_=req.body.name;
+    date_=req.body.start_date;
+
+    setInterval(()=>{
+        var xhttp1 = new XMLHttpRequest();
+        xhttp1.open("POST", "http://localhost:3014/macd");
+        xhttp1.setRequestHeader("Content-Type", "application/json");
+        xhttp1.send(JSON.stringify({ "name": name_, "start_date": date_}));
+    },1000);
+    
+    res.json()
+});
+
+app.post('/stopMACD', function(req, res){
+    
 });
 
 connection.init();
