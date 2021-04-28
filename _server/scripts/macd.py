@@ -305,19 +305,22 @@ def macd_buy_sell(name, end, data):
                 selling_rebalance(str(float(quantity)*float(curr_close)),"MACD")
                 hodling=False
         else:
-            print("BUUUUUYY!!!!")
-            print('Bought at the price of:',curr_close,'$')
-            time = datetime.now()
-            r = requests.post('http://localhost:3014/api/order', json={
-                    "timestamp": str(time),
-                    "type":"BUY",
-                    "name": name,
-                    "quantity": str(float(get_wallet_balance("MACD"))/curr_close),
-                    "price":float(curr_close),
-                    "method": "MACD"
-            })
-            buying_rebalance(curr_close, str(float(get_wallet_balance("MACD"))/curr_close), "MACD")
-            hodling=True
+            if hodling==False:
+                print("BUUUUUYY!!!!")
+                print('Bought at the price of:',curr_close,'$')
+                time = datetime.now()
+                r = requests.post('http://localhost:3014/api/order', json={
+                        "timestamp": str(time),
+                        "type":"BUY",
+                        "name": name,
+                        "quantity": str(float(get_wallet_balance("MACD"))/curr_close),
+                        "price":float(curr_close),
+                        "method": "MACD"
+                })
+                buying_rebalance(curr_close, str(float(get_wallet_balance("MACD"))/curr_close), "MACD")
+                hodling=True
+            else:
+                print("ALREADY HODLING!")
     else:
         print("Still watching the trend. Nothing to trade atm!")
 
@@ -476,7 +479,7 @@ def get_wallet_quantity(method):
 
 def hodling_check(method):
     r = requests.post('http://localhost:3014/api/getWallet', json={"method":method})
-    if int(r.json()['data'][0]['quantity']) == 0:
+    if int(r.json()['data'][0]['quantity']) == 0 and int(r.json()['data'][0]['balance']!=0):
         return False
     else:
         return True

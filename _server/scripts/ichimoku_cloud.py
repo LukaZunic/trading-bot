@@ -489,18 +489,21 @@ dt_string = time.strftime("%Y-%m-%d")
 
 name = sys.argv[1]
 start = sys.argv[2]
-end = str(dt_string)  #sell "2021-04-29" #buy "2020-06-04"
+end = str(dt_string)  #sell "2020-08-19" #buy "2020-07-07"
 
 data = get_data(name, start, end)
+index = pd.date_range(end, periods=25, freq='D')
+columns = data.columns
+data_pred = pd.DataFrame(index=index, columns=columns)
+data = pd.concat([data,data_pred])
 
-data['MA_20'] = (data['High'].rolling(window=20).mean() + data['Low'].rolling(window=20).mean() + data['Close'].rolling(window=20).mean())/3
-data['STD_20'] = (data['High'].rolling(window=20).std() + data['Low'].rolling(window=20).std() + data['Close'].rolling(window=20).std())/3
-data['upper_band'] = data['MA_20'] + (data['STD_20']*2)
-data['lower_band'] = data['MA_20'] - (data['STD_20']*2)
+data['tenkan_sen'] = (data['High'].rolling(window = 9).max() + data['Low'].rolling(window = 9).min()) / 2
+data['kijun_sen'] = (data['High'].rolling(window = 26).max() + data['Low'].rolling(window = 26).min()) / 2
+data['senkou_span_A'] = ((data['tenkan_sen'] + data['kijun_sen']) / 2).shift(26)
+data['senkou_span_B'] = ((data['High'].rolling(window=52).max() + data['Low'].rolling(window=52).min()) / 2).shift(26)
+data['chikou_span'] = data['Close'].shift(-26)
 
-data['12_period_ema'] = (data['High'].ewm(span=12, adjust=False).mean() + data['Low'].ewm(span=12, adjust=False).mean() + data['Close'].ewm(span=12, adjust=False).mean())/3
-data['26_period_ema'] = (data['High'].ewm(span=26, adjust=False).mean() + data['Low'].ewm(span=26, adjust=False).mean() + data['Close'].ewm(span=26, adjust=False).mean())/3
-data['macd'] = data['12_period_ema'] - data['26_period_ema']
-data['signal_line'] = data['macd'].ewm(span=9, adjust=False).mean()
+last_date_with_value = get_last_date(end)
 
-bollinger_macd_buy_sell(name, data, end)
+curr_close_price, curr_span_a, curr_span_b, curr_kijun, curr_tenkan = get_latest_data(data,last_date_with_value)
+ichimoku_cloud_buy_sell(name, curr_close_price, curr_span_a, curr_span_b, curr_kijun, curr_tenkan)
