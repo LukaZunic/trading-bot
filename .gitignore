@@ -2,4 +2,4 @@ config.py
 
 /__pycache__
 
-/server/node_modules
+/_server/node_modules
