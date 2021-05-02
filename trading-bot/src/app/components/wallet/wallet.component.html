@@ -1,0 +1,10 @@
+
+<div>
+    Wallet balance: ${{wallet.balance}}
+</div>
+
+<div *ngFor="let crypto of wallet.crypto">
+    {{crypto.name}}
+    {{crypto.value}}
+    {{crypto.amount}}
+</div>
