@@ -6,11 +6,13 @@ import { AppComponent } from './app.component';
 import { WalletComponent } from './components/wallet/wallet.component';
 
 import { HttpClientModule } from '@angular/common/http';
+import { OrderComponent } from './components/order/order.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    WalletComponent
+    WalletComponent,
+    OrderComponent
   ],
   imports: [
     BrowserModule,
