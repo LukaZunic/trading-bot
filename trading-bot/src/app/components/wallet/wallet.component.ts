@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Wallet } from '../../interfaces/wallet';
+import { MarketService } from '../../services/market.service';
+import {Observable} from 'rxjs';
 
 @Component({
   selector: 'app-wallet',
@@ -9,11 +11,12 @@ import { Wallet } from '../../interfaces/wallet';
 export class WalletComponent implements OnInit {
 
   wallet: Wallet;
+  marketData$: Observable<any>;
 
-  constructor() { }
+  constructor(public market: MarketService) { }
 
   ngOnInit(): void {
-    
+
     this.wallet = {
       balance: 10,
       crypto: [
@@ -23,8 +26,12 @@ export class WalletComponent implements OnInit {
           amount: 20
         }
       ]
-    }
+    };
+
+    this.marketData$ = this.market.marketData$;
 
   }
+
+
 
 }

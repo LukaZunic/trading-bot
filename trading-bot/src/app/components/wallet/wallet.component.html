@@ -8,3 +8,7 @@
     {{crypto.value}}
     {{crypto.amount}}
 </div>
+
+<div *ngIf="marketData$ | async as data">
+  {{data.message}}
+</div>
