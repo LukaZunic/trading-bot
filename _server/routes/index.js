@@ -5,12 +5,12 @@ var wallet             = require('./wallet.js');
 
 /* ORDER */
 router.post('/api/order',               order.order);
-router.post('/api/getAllOrder',         order.getAllOrder);
+router.get('/api/getAllOrder',          order.getAllOrder);
 
 /* WALLET */
 router.post('/api/createWallet',        wallet.createWallet);
-router.post('/api/getWallet',           wallet.getWallet);
-router.post('/api/getAllWallet',        wallet.getAllWallet);
+router.get('/api/getWallet',            wallet.getWallet);
+router.get('/api/getAllWallet',         wallet.getAllWallet);
 router.post('/api/rebalance',           wallet.rebalance);
 
 module.exports = router;
