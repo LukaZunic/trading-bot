@@ -22,12 +22,20 @@ var order = {
                 functions.mysql_queryV2(query, function(dataSent){
                     functions.sendRes(res, dataSent);
                 });
-            
-            
-            
             }else{
                 functions.sendRes(res,{ success: false, message: 'Error, please check the passed data.!', status: 502, data:[]});
             }
+        }catch(err){
+            console.log(err);
+            functions.sendRes(res,{ success: false, message: 'Error, please check the passed data.', status: 503, data:err});
+        }
+    },
+    getAllOrder: (req, res, next) => { 
+        try{
+            let query = "SELECT * FROM `tradingbot`.`order`";            
+            functions.mysql_queryV2(query,(dataSent)=>{
+                functions.sendRes(res, dataSent);
+            });
         }catch(err){
             console.log(err);
             functions.sendRes(res,{ success: false, message: 'Error, please check the passed data.', status: 503, data:err});

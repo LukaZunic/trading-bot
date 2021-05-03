@@ -5,6 +5,7 @@ var wallet             = require('./wallet.js');
 
 /* ORDER */
 router.post('/api/order',               order.order);
+router.post('/api/getAllOrder',         order.getAllOrder);
 
 /* WALLET */
 router.post('/api/createWallet',        wallet.createWallet);
