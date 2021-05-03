@@ -41,6 +41,17 @@ var wallet = {
             functions.sendRes(res,{ success: false, message: 'Error, please check the passed data.', status: 503, data:err});
         }
     },
+    getAllWallet: (req, res, next) => { 
+        try{
+            let query = "SELECT * FROM `tradingbot`.`wallet`";            
+            functions.mysql_queryV2(query,(dataSent)=>{
+                functions.sendRes(res, dataSent);
+            });
+        }catch(err){
+            console.log(err);
+            functions.sendRes(res,{ success: false, message: 'Error, please check the passed data.', status: 503, data:err});
+        }
+    },
     rebalance: (req, res, next) => {
         try{
             if(req.body.rebalance && req.body.quantity && req.body.method){

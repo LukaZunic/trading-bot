@@ -9,6 +9,7 @@ router.post('/api/order',               order.order);
 /* WALLET */
 router.post('/api/createWallet',        wallet.createWallet);
 router.post('/api/getWallet',           wallet.getWallet);
+router.post('/api/getAllWallet',        wallet.getAllWallet);
 router.post('/api/rebalance',           wallet.rebalance);
 
 module.exports = router;
