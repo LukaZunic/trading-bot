@@ -7,12 +7,14 @@ import { WalletComponent } from './components/wallet/wallet.component';
 
 import { HttpClientModule } from '@angular/common/http';
 import { OrderComponent } from './components/order/order.component';
+import { NavbarComponent } from './components/navbar/navbar.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     WalletComponent,
-    OrderComponent
+    OrderComponent,
+    NavbarComponent
   ],
   imports: [
     BrowserModule,
