@@ -8,6 +8,7 @@ import { WalletComponent } from './components/wallet/wallet.component';
 import { HttpClientModule } from '@angular/common/http';
 import { OrderComponent } from './components/order/order.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   declarations: [
@@ -19,7 +20,8 @@ import { NavbarComponent } from './components/navbar/navbar.component';
   imports: [
     BrowserModule,
     AppRoutingModule,
-    HttpClientModule
+    HttpClientModule,
+    BrowserAnimationsModule
   ],
   providers: [
     HttpClientModule
