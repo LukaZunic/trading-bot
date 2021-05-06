@@ -20,6 +20,7 @@ import {MatToolbarModule} from '@angular/material/toolbar';
 import {MatButtonModule} from '@angular/material/button';
 import {MatCardModule} from '@angular/material/card';
 import {MatSliderModule} from '@angular/material/slider';
+import {MatListModule} from '@angular/material/list';
 
 
 
@@ -43,7 +44,8 @@ import {MatSliderModule} from '@angular/material/slider';
     MatToolbarModule,
     MatButtonModule,
     MatSliderModule,
-    MatCardModule
+    MatCardModule,
+    MatListModule
   ],
   providers: [
     HttpClientModule
