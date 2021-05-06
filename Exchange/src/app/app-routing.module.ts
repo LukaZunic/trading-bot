@@ -1,16 +1,15 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-import { OrderComponent } from './components/order/order.component';
-import { WalletComponent } from './components/wallet/wallet.component';
+import {DashboardComponent} from './components/dashboard/dashboard.component';
 
 const routes: Routes = [
   {
-    path: 'wallet',
-    component: WalletComponent
+    path: '',
+    component: DashboardComponent
   },
   {
-    path: 'order',
-    component: OrderComponent
+    path: '**',
+    redirectTo: ''
   }
 ];
 

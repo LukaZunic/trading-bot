@@ -1,10 +1,8 @@
 
-<div *ngIf="marketData$ | async as item">
-  {{item.message}}
-</div>
+<mat-card *ngIf="wallet$ | async as item">
 
-<div *ngIf="wallet$ | async as item">
-  {{item.data}}
-</div>
+  {{item}}
+
+</mat-card>
 
 

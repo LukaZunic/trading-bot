@@ -4,6 +4,10 @@ import { NgModule } from '@angular/core';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { WalletComponent } from './components/wallet/wallet.component';
+import { DashboardComponent } from './components/dashboard/dashboard.component';
+import { MarketComponent } from './components/market/market.component';
+import { OrdersComponent } from './components/orders/orders.component';
+import { GraphComponent } from './components/graph/graph.component';
 
 import { HttpClientModule } from '@angular/common/http';
 import { OrderComponent } from './components/order/order.component';
@@ -14,11 +18,9 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import {MatIconModule} from '@angular/material/icon';
 import {MatToolbarModule} from '@angular/material/toolbar';
 import {MatButtonModule} from '@angular/material/button';
-import { MatSliderModule } from '@angular/material/slider';
-import { DashboardComponent } from './components/dashboard/dashboard.component';
-import { MarketComponent } from './components/market/market.component';
-import { OrdersComponent } from './components/orders/orders.component';
-import { GraphComponent } from './components/graph/graph.component';
+import {MatCardModule} from '@angular/material/card';
+import {MatSliderModule} from '@angular/material/slider';
+
 
 
 @NgModule({
@@ -40,7 +42,8 @@ import { GraphComponent } from './components/graph/graph.component';
     MatIconModule,
     MatToolbarModule,
     MatButtonModule,
-    MatSliderModule
+    MatSliderModule,
+    MatCardModule
   ],
   providers: [
     HttpClientModule

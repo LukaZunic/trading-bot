@@ -6,7 +6,6 @@ var functions    = require('./functions.js');
 var order = {
     order: (req, res, next) => {
         try{
-
             if(req.body.timestamp && req.body.type && req.body.name && req.body.quantity && req.body.price && req.body.method){
                 let order_details = [
                     req.body.timestamp,

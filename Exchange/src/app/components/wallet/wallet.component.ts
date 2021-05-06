@@ -10,15 +10,11 @@ import {Observable} from 'rxjs';
 export class WalletComponent implements OnInit {
 
   wallet$: Observable<any>;
-  marketData$: Observable<any>;
 
   constructor(public market: MarketService) { }
 
   ngOnInit(): void {
-
-    this.marketData$ = this.market.marketData$;
     this.wallet$ = this.market.wallet$;
-
   }
 
 
