@@ -1,0 +1,11 @@
+
+<mat-card *ngIf="orders$ | async as orders">
+
+  <div *ngFor="let order of orders | keyvalue">
+    {{order.value.timestamp}}
+    {{order.value.type}}
+    {{order.value.name}}
+  </div>
+
+
+</mat-card>
