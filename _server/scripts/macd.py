@@ -457,7 +457,7 @@ def create_wallet(name, balance, method):
     requests.post('http://localhost:3014/api/createWallet', json={"name":name,"balance":balance,"method":method})
 
 def get_wallet_balance(method):
-    r = requests.post('http://localhost:3014/api/getWallet', json={"method":method})
+    r = requests.get('http://localhost:3014/api/getWallet', json={"method":method})
     return r.json()['data'][0]['balance']
 
 def buying_rebalance(buying_price, quantity, method):
@@ -474,11 +474,11 @@ def selling_rebalance(revenue, method):
     requests.post('http://localhost:3014/api/rebalance', json={"rebalance": rebalance, "quantity":"0", "method":method})
 
 def get_wallet_quantity(method):
-    r = requests.post('http://localhost:3014/api/getWallet', json={"method":method})
+    r = requests.get('http://localhost:3014/api/getWallet', json={"method":method})
     return r.json()['data'][0]['quantity']
 
 def hodling_check(method):
-    r = requests.post('http://localhost:3014/api/getWallet', json={"method":method})
+    r = requests.get('http://localhost:3014/api/getWallet', json={"method":method})
     if int(r.json()['data'][0]['quantity']) == 0 and int(r.json()['data'][0]['balance']!=0):
         return False
     else:
