@@ -6,8 +6,9 @@ var functions    = require('./functions.js');
 var order = {
     order: (req, res, next) => {
         try{
-            if(req.body.timestamp && req.body.type && req.body.name && req.body.quantity && req.body.price && req.body.method){
+            if(req.body.wallet_id && req.body.timestamp && req.body.type && req.body.name && req.body.quantity && req.body.price && req.body.method){
                 let order_details = [
+                    req.body.wallet_id,
                     req.body.timestamp,
                     req.body.type,
                     req.body.name,
@@ -15,7 +16,7 @@ var order = {
                     req.body.price,
                     req.body.method
                 ]
-                let query = "INSERT INTO `tradingbot`.`order` (`timestamp`, `type`, `name`, `quantity`, `price`, `method`) VALUES (?);";
+                let query = "INSERT INTO `tradingbot`.`order` (`wallet_id`, `timestamp`, `type`, `name`, `quantity`, `price`, `method`) VALUES (?);";
                 let table = [order_details];
                 query = mysql.format(query, table);
                 functions.mysql_queryV2(query, function(dataSent){

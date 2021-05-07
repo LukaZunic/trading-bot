@@ -8,7 +8,7 @@ var macd = {
     macd: (req, res , next) => {
         const { spawn } = require('child_process');
         //var pip_prerequirments = ['-m pip install sys','-m pip install numpy','-m pip install pandas','-m pip install yfinance','-m pip install requests','-m pip install datetime', '-m pip install plotly']
-        const childPython = spawn('py', ['./scripts/macd.py',req.body.id,req.body.name,req.body.start_date]);
+        const childPython = spawn('py', ['./scripts/macd.py',req.body.id_macd,req.body.name,req.body.start_date]);
         
         childPython.stdout.on('data', (data) => {
             console.log(`stdout: ${data}`);
@@ -22,14 +22,15 @@ var macd = {
         res.json({ message: 'MACD called'});
     },
     startmacd: (req, res, next) => {
-        name_=req.body.name;
-        date_=req.body.start_date;
+        var id_macd = req.body.id_macd;
+        var name_macd=req.body.name;
+        var date_macd=req.body.start_date;
 
         setInterval(()=>{
             var xhttp1 = new XMLHttpRequest();
             xhttp1.open("POST", "http://localhost:3014/api/macd/script");
             xhttp1.setRequestHeader("Content-Type", "application/json");
-            xhttp1.send(JSON.stringify({"id":id, "name": name_, "start_date": date_}));
+            xhttp1.send(JSON.stringify({"id_macd":id_macd, "name": name_macd, "start_date": date_macd}));
         },1000);
 
         res.json({message: 'MACD bot running'});

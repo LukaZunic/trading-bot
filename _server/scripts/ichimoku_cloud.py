@@ -1,4 +1,3 @@
-import plotly.graph_objs as go
 import numpy as np
 import pandas as pd
 import yfinance as yf
@@ -10,99 +9,6 @@ def get_data(name_, start_, end_):
     data = yf.download(name_, start=start_, end=end_)
     return data
 
-def plot_data(data):
-    fig = go.Figure()
-    fig.add_trace(go.Candlestick(x=data.index,
-            open=data['Open'],
-            high=data['High'],
-            low=data['Low'],
-            close=data['Close'], name = 'market data')
-    )
-    fig.update_layout(
-        title='Live share price evolution',
-        yaxis_title='Coin/Stock Price (US Dollars)'
-    )
-    fig.update_xaxes(
-        rangeslider_visible=True,
-        rangeselector=dict(
-            buttons=list([
-                dict(step="all")
-            ])
-        )
-    )
-    fig.show()
-
-def plot_ichimoku(data):
-    fig = go.Figure()
-
-    fig.add_trace(go.Candlestick(
-                x=data.index,
-                open=data['Open'],
-                high=data['High'],
-                low=data['Low'],
-                close=data['Close'],
-                name = 'Market Data'
-        )
-    )
-
-    fig.add_trace(go.Scatter(
-        x=data.index,
-        y=data['tenkan_sen'],
-        line=dict(
-            color='royalblue',
-            width=.8
-        ),
-        name = 'Tenkan Sen'
-        )
-    )
-
-    fig.add_trace(go.Scatter(
-        x=data.index,
-        y=data['kijun_sen'],
-        line=dict(
-            color='red',
-            width=.8
-        ),
-        name = 'Kijun Sen'
-        )
-    )
-    fig.add_trace(go.Scatter(
-        x=data.index,
-        y=data['senkou_span_A'],
-        line=dict(
-            color='black',
-            width=.8
-        ),
-        name = 'Senkou Span A'
-        )
-    )
-    fig.add_trace(go.Scatter(
-        x=data.index,
-        y=data['senkou_span_B'],
-        line=dict(
-            color='purple',
-            width=.8
-        ),
-        name = 'Senkou Span B',
-        fill = 'tonexty',
-        fillcolor= 'lightgreen',
-        opacity=0.01
-        )
-    )
-    fig.add_trace(go.Scatter(
-        x=data.index,
-        y=data['chikou_span'],
-        line=dict(
-            color='orange',
-            width=.8
-        ),
-        name = 'Chikou Span'
-        )
-    )
-
-
-    fig.show()
-    fig.write_html("./ichimoku.html")
 
 def get_last_date(end):
     last_date = end
@@ -138,23 +44,23 @@ def get_last_date(end):
     last_date_with_value = str('20' + year + '-' + month + '-' + day)
     return last_date_with_value
 
-def ichimoku_cloud_buy_sell(id,name, curr_close_price, curr_span_a, curr_span_b, curr_kijun, curr_tenkan):
-    hodling = hodling_check(id,"ICHIMOKU CLOUD")
+def ichimoku_cloud_buy_sell(id_,name, curr_close_price, curr_span_a, curr_span_b, curr_kijun, curr_tenkan):
+    hodling = hodling_check(id_,"ICHIMOKU CLOUD")
     if curr_close_price > curr_span_a and curr_close_price > curr_span_b:
         if abs(curr_kijun-curr_tenkan) >= 0 and abs(curr_kijun-curr_tenkan) <= 2.5:
             print("BUUUUY!!!")
             print('Bought at the price of:',curr_close_price,'$')
             time = datetime.now()
             r = requests.post('http://localhost:3014/api/order', json={
-                    "wallet_id": id,
+                    "wallet_id": id_,
                     "timestamp": str(time),
                     "type":"BUY",
                     "name": name,
-                    "quantity": str(float(get_wallet_balance(id,"ICHIMOKU CLOUD"))/curr_close_price),
+                    "quantity": str(float(get_wallet_balance(id_,"ICHIMOKU CLOUD"))/curr_close_price),
                     "price":float(curr_close_price),
                     "method": "ICHIMOKU CLOUD"
             })
-            buying_rebalance(id,curr_close_price, str(float(get_wallet_balance(id,"ICHIMOKU CLOUD"))/curr_close_price), "ICHIMOKU CLOUD")
+            buying_rebalance(id_,curr_close_price, str(float(get_wallet_balance(id_,"ICHIMOKU CLOUD"))/curr_close_price), "ICHIMOKU CLOUD")
             print(r.json())
             hodling = True
         else:
@@ -166,9 +72,9 @@ def ichimoku_cloud_buy_sell(id,name, curr_close_price, curr_span_a, curr_span_b,
                     print("SEEEELLL!!!!")
                     print('Sold at the price of:',curr_close_price,'$')
                     time = datetime.now()
-                    quantity = get_wallet_quantity(id,"ICHIMOKU CLOUD")
+                    quantity = get_wallet_quantity(id_,"ICHIMOKU CLOUD")
                     r = requests.post('http://localhost:3014/api/order', json={
-                            "wallet_id": id,
+                            "wallet_id": id_,
                             "timestamp": str(time),
                             "type":"SELL",
                             "name": name,
@@ -176,7 +82,7 @@ def ichimoku_cloud_buy_sell(id,name, curr_close_price, curr_span_a, curr_span_b,
                             "price": float(curr_close_price),
                             "method": "ICHIMOKU CLOUD"
                     })
-                    selling_rebalance(id,str(float(quantity)*float(curr_close_price)),"ICHIMOKU CLOUD")
+                    selling_rebalance(id_,str(float(quantity)*float(curr_close_price)),"ICHIMOKU CLOUD")
                     hodling=False
                 else:
                     print("Watch for conversion and base line! Might sell soon!")
@@ -193,296 +99,34 @@ def get_latest_data(data, last_date_with_value):
     curr_tenkan = data.loc[last_date_with_value]['tenkan_sen']
     return curr_close_price, curr_span_a, curr_span_b, curr_kijun, curr_tenkan
 
-def plot_bollinger(data):
-    fig = go.Figure()
 
-    fig.add_trace(go.Candlestick(
-                x=data.index,
-                open=data['Open'],
-                high=data['High'],
-                low=data['Low'],
-                close=data['Close'],
-                name = 'Market Data'
-        )
-    )
+def create_wallet(id_,name, balance, method):
+    requests.post('http://localhost:3014/api/createWallet', json={"id":id_,"name":name,"balance":balance,"method":method})
 
-    fig.add_trace(go.Scatter(
-        x=data.index,
-        y=data['upper_band'],
-        line=dict(
-            color='blue',
-            width=.8
-        ),
-        name = 'Upper Bollinger Band'
-        )
-    )
-
-    fig.add_trace(go.Scatter(
-        x=data.index,
-        y=data['lower_band'],
-        line=dict(
-            color='red',
-            width=.8
-        ),
-        name = 'Lower Bollinger Band'
-        )
-    )
-    fig.add_trace(go.Scatter(
-        x=data.index,
-        y=data['MA_20'],
-        line=dict(
-            color='black',
-            width=.8
-        ),
-        name = 'Moving average 20 period'
-        )
-    )
-    
-
-    fig.show()
-    fig.write_html("./bollinger.html")
-
-def plot_macd(data):
-    fig = go.Figure()
-
-    fig.add_trace(go.Candlestick(
-                x=data.index,
-                open=data['Open'],
-                high=data['High'],
-                low=data['Low'],
-                close=data['Close'],
-                name = 'Market Data'
-        )
-    )
-
-    fig.add_trace(go.Scatter(
-        x=data.index,
-        y=data['macd'],
-        line=dict(
-            color='purple',
-            width=.8
-        ),
-        name = 'MACD line'
-        )
-    )
-
-    fig.add_trace(go.Scatter(
-        x=data.index,
-        y=data['signal_line'],
-        line=dict(
-            color='green',
-            width=.8
-        ),
-        name = 'Signal Line'
-        )
-    )
-
-    fig.show()
-    fig.write_html("./macd.html")
-
-def macd_buy_sell(name, end, data):
-    hodling = hodling_check("MACD")
-    last_date = get_last_date(end)
-    date_before_last = get_last_date(last_date)
-    curr_macd_line = data.loc[last_date]['macd']
-    curr_signal_line = data.loc[last_date]['signal_line']
-    curr_close = data.loc[last_date]['Close']
-    prev_macd_line = data.loc[date_before_last]['macd']
-    prev_signal_line = data.loc[date_before_last]['signal_line']
-    if prev_macd_line == prev_signal_line or abs(prev_macd_line - prev_signal_line) < 0.5:
-        if curr_macd_line < curr_signal_line:
-            if hodling==True:
-                print("SEEEELLL!!!!")
-                print('Sold at the price of:',curr_close,'$')
-                time = datetime.now()
-                quantity = get_wallet_quantity("MACD")
-                r = requests.post('http://localhost:3014/api/order', json={
-                    "timestamp": str(time),
-                    "type":"SELL",
-                    "name": name,
-                    "quantity": str(quantity),
-                    "price": float(curr_close),
-                    "method": "MACD"
-                })
-                selling_rebalance(str(float(quantity)*float(curr_close)),"MACD")
-                hodling=False
-        else:
-            if hodling==False:
-                print("BUUUUUYY!!!!")
-                print('Bought at the price of:',curr_close,'$')
-                time = datetime.now()
-                r = requests.post('http://localhost:3014/api/order', json={
-                        "timestamp": str(time),
-                        "type":"BUY",
-                        "name": name,
-                        "quantity": str(float(get_wallet_balance("MACD"))/curr_close),
-                        "price":float(curr_close),
-                        "method": "MACD"
-                })
-                buying_rebalance(curr_close, str(float(get_wallet_balance("MACD"))/curr_close), "MACD")
-                hodling=True
-            else:
-                print("ALREADY HODLING!")
-    else:
-        print("Still watching the trend. Nothing to trade atm!")
-
-def plot_bollinger_macd(data):
-    fig = go.Figure()
-
-    fig.add_trace(go.Candlestick(
-                x=data.index,
-                open=data['Open'],
-                high=data['High'],
-                low=data['Low'],
-                close=data['Close'],
-                name = 'Market Data'
-        )
-    )
-
-    fig.add_trace(go.Scatter(
-        x=data.index,
-        y=data['macd'],
-        line=dict(
-            color='purple',
-            width=.8
-        ),
-        name = 'MACD line'
-        )
-    )
-
-    fig.add_trace(go.Scatter(
-        x=data.index,
-        y=data['signal_line'],
-        line=dict(
-            color='green',
-            width=.8
-        ),
-        name = 'Signal Line'
-        )
-    )
-    fig.add_trace(go.Scatter(
-        x=data.index,
-        y=data['upper_band'],
-        line=dict(
-            color='blue',
-            width=.8
-        ),
-        name = 'Upper Bollinger Band'
-        )
-    )
-
-    fig.add_trace(go.Scatter(
-        x=data.index,
-        y=data['lower_band'],
-        line=dict(
-            color='red',
-            width=.8
-        ),
-        name = 'Lower Bollinger Band'
-        )
-    )
-    fig.add_trace(go.Scatter(
-        x=data.index,
-        y=data['MA_20'],
-        line=dict(
-            color='black',
-            width=.8
-        ),
-        name = 'Moving average 20 period'
-        )
-    )
-
-    fig.show()
-    fig.write_html("./bollinger-macd.html")
-
-def macd_buy_sell_check(data,end,hodling):
-    last_date = get_last_date(end)
-    date_before_last = get_last_date(last_date)
-    curr_macd_line = data.loc[last_date]['macd']
-    curr_signal_line = data.loc[last_date]['signal_line']
-    prev_macd_line = data.loc[date_before_last]['macd']
-    prev_signal_line = data.loc[date_before_last]['signal_line']
-    if prev_macd_line == prev_signal_line or abs(prev_macd_line - prev_signal_line) < 0.8:
-        if curr_macd_line < curr_signal_line:
-                return 'Sell'
-        else:
-            return 'Buy'
-    else:
-        return 'Wait'
-
-def bollinger_macd_buy_sell(name, data, end):
-    hodling = hodling_check("BB & MACD")
-    check_macd = macd_buy_sell_check(data, end, hodling)
-    last_date = get_last_date(end)
-    distance = abs(data.loc[last_date]['upper_band'] - data.loc[last_date]['lower_band'])
-    curr_close = data.loc[last_date]['Close']
-    if check_macd == 'Buy':
-        if data.loc[last_date]['Close'] < data.loc[last_date]['upper_band'] and data.loc[last_date]['Close'] > (data.loc[last_date]['upper_band']-(distance/3)):
-            print("BUUUUYYY!!!!")
-            time = datetime.now()
-            r = requests.post('http://localhost:3014/api/order', json={
-                    "timestamp": str(time),
-                    "type":"BUY",
-                    "name": name,
-                    "quantity": str(float(get_wallet_balance("BB & MACD"))/curr_close),
-                    "price":float(curr_close),
-                    "method": "BB & MACD"
-            })
-            buying_rebalance(curr_close, str(float(get_wallet_balance("BB & MACD"))/curr_close), "BB & MACD")
-            hodling = True
-        else:
-            print("MACD says buy, but must waiting for BB confirmation!")
-    elif check_macd == 'Sell':
-        if data.loc[last_date]['Close'] > data.loc[last_date]['lower_band'] and data.loc[last_date]['Close'] < ((distance/3)+data.loc[last_date]['lower_band']):
-            if hodling == True:
-                print("SEEELLLL!!!!")
-                time = datetime.now()
-                quantity = get_wallet_quantity("BB & MACD")
-                r = requests.post('http://localhost:3014/api/order', json={
-                    "timestamp": str(time),
-                    "type":"SELL",
-                    "name": name,
-                    "quantity": str(quantity),
-                    "price": float(curr_close),
-                    "method": "BB & MACD"
-                })
-                selling_rebalance(str(float(quantity)*float(curr_close)),"BB & MACD")
-                hodling = False
-            else:
-                print("U dont own any coins/stocks atm to sell!")
-        else:
-            print("MACD says sell, but must waiting for BB confirmation!")
-    else:
-        print('Wait, still speculating!')
-
-
-def create_wallet(id,name, balance, method):
-    requests.post('http://localhost:3014/api/createWallet', json={"id":id,"name":name,"balance":balance,"method":method})
-
-def get_wallet_balance(id,method):
-    r = requests.get('http://localhost:3014/api/getWallet', json={"id":id, "method":method})
+def get_wallet_balance(id_,method):
+    r = requests.get('http://localhost:3014/api/getWallet', json={"id":id_, "method":method})
     return r.json()['data'][0]['balance']
 
-def buying_rebalance(id,buying_price, quantity, method):
-    balance = float(get_wallet_balance(id,method))
+def buying_rebalance(id_,buying_price, quantity, method):
+    balance = float(get_wallet_balance(id_,method))
     rebalance1 = balance/buying_price
     rebalance = float(balance - (rebalance1*float(buying_price)))
     if rebalance < 1:
         rebalance = "0"
-    requests.post('http://localhost:3014/api/rebalance', json={"rebalance": rebalance, "quantity":quantity, "method":method})
+    requests.post('http://localhost:3014/api/rebalance', json={"id": id_, "rebalance": rebalance, "quantity":quantity, "method":method})
 
-def selling_rebalance(id,revenue, method):
-    balance = get_wallet_balance(id,method)
+def selling_rebalance(id_,revenue, method):
+    balance = get_wallet_balance(id_,method)
     rebalance = float(balance) + float(revenue)
-    requests.post('http://localhost:3014/api/rebalance', json={"rebalance": rebalance, "quantity":"0", "method":method})
+    requests.post('http://localhost:3014/api/rebalance', json={"id": id_, "rebalance": rebalance, "quantity":"0", "method":method})
 
-def get_wallet_quantity(id,method):
-    r = requests.get('http://localhost:3014/api/getWallet', json={"id":id, "method":method})
+def get_wallet_quantity(id_,method):
+    r = requests.get('http://localhost:3014/api/getWallet', json={"id":id_, "method":method})
     return r.json()['data'][0]['quantity']
 
-def hodling_check(id,method):
-    r = requests.get('http://localhost:3014/api/getWallet', json={"id":id, "method":method})
-    if int(r.json()['data'][0]['quantity']) == 0 and int(r.json()['data'][0]['balance']!=0):
+def hodling_check(id_,method):
+    r = requests.get('http://localhost:3014/api/getWallet', json={"id":id_, "method":method})
+    if int(r.json()['data'][0]['quantity']) == 0 and int(r.json()['data'][0]['balance'])!=0:
         return False
     else:
         return True
@@ -490,7 +134,7 @@ def hodling_check(id,method):
 time = datetime.now()
 dt_string = time.strftime("%Y-%m-%d")
 
-id = sys.argv[1]
+id_ = sys.argv[1]
 name = sys.argv[2]
 start = sys.argv[3]
 end = str(dt_string)  #sell "2020-08-19" #buy "2020-07-07"
@@ -510,4 +154,4 @@ data['chikou_span'] = data['Close'].shift(-26)
 last_date_with_value = get_last_date(end)
 
 curr_close_price, curr_span_a, curr_span_b, curr_kijun, curr_tenkan = get_latest_data(data,last_date_with_value)
-ichimoku_cloud_buy_sell(id,name, curr_close_price, curr_span_a, curr_span_b, curr_kijun, curr_tenkan)
+ichimoku_cloud_buy_sell(id_,name, curr_close_price, curr_span_a, curr_span_b, curr_kijun, curr_tenkan)

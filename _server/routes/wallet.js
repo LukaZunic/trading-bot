@@ -26,7 +26,7 @@ var wallet = {
     getWallet: (req, res, next) => { 
         try{
             if(req.body.id && req.body.method){
-                let query = "SELECT * FROM `tradingbot`.`wallet` WHERE `id`=? & `method`=?";
+                let query = "SELECT * FROM `tradingbot`.`wallet` WHERE `id`=? AND `method`=?";
                 let table = [req.body.id,req.body.method];
                 query = mysql.format(query, table);
                 functions.mysql_queryV2(query, function(dataSent){
@@ -53,9 +53,9 @@ var wallet = {
     },
     rebalance: (req, res, next) => {
         try{
-            if(req.body.rebalance && req.body.quantity && req.body.method){
-                let query = "UPDATE `tradingbot`.`wallet` SET `balance`= ?, `quantity`=? WHERE `method`=?";
-                let table = [req.body.rebalance, req.body.quantity, req.body.method];
+            if(req.body.id && req.body.rebalance && req.body.quantity && req.body.method){
+                let query = "UPDATE `tradingbot`.`wallet` SET `balance`= ?, `quantity`=? WHERE `method`=? and `id`=?";
+                let table = [req.body.rebalance, req.body.quantity, req.body.method, req.body.id];
                 query = mysql.format(query, table);
                 functions.mysql_queryV2(query, function(dataSent){
                     functions.sendRes(res, dataSent);
