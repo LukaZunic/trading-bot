@@ -32,7 +32,7 @@ var macd = {
             xhttp1.send(JSON.stringify({ "name": name_, "start_date": date_}));
         },1000);
 
-        res.json()
+        res.json({message: 'MACD bot running'});
     }
 };
 
