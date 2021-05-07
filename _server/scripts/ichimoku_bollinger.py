@@ -393,7 +393,7 @@ def plot_bollinger_macd(data):
     fig.show()
     fig.write_html("./bollinger-macd.html")
 
-def macd_buy_sell_check(data,end,hodling):
+def macd_buy_sell_check(id,data,end,hodling):
     last_date = get_last_date(end)
     date_before_last = get_last_date(last_date)
     curr_macd_line = data.loc[last_date]['macd']
@@ -408,9 +408,9 @@ def macd_buy_sell_check(data,end,hodling):
     else:
         return 'Wait'
 
-def bollinger_macd_buy_sell(name, data, end):
-    hodling = hodling_check("BB & MACD")
-    check_macd = macd_buy_sell_check(data, end, hodling)
+def bollinger_macd_buy_sell(id,name, data, end):
+    hodling = hodling_check(id,"BB & MACD")
+    check_macd = macd_buy_sell_check(id,data, end, hodling)
     last_date = get_last_date(end)
     distance = abs(data.loc[last_date]['upper_band'] - data.loc[last_date]['lower_band'])
     curr_close = data.loc[last_date]['Close']
@@ -419,14 +419,15 @@ def bollinger_macd_buy_sell(name, data, end):
             print("BUUUUYYY!!!!")
             time = datetime.now()
             r = requests.post('http://localhost:3014/api/order', json={
+                    "wallet_id": id,
                     "timestamp": str(time),
                     "type":"BUY",
                     "name": name,
-                    "quantity": str(float(get_wallet_balance("BB & MACD"))/curr_close),
+                    "quantity": str(float(get_wallet_balance(id,"BB & MACD"))/curr_close),
                     "price":float(curr_close),
                     "method": "BB & MACD"
             })
-            buying_rebalance(curr_close, str(float(get_wallet_balance("BB & MACD"))/curr_close), "BB & MACD")
+            buying_rebalance(id,curr_close, str(float(get_wallet_balance(id,"BB & MACD"))/curr_close), "BB & MACD")
             hodling = True
         else:
             print("MACD says buy, but must waiting for BB confirmation!")
@@ -435,8 +436,9 @@ def bollinger_macd_buy_sell(name, data, end):
             if hodling == True:
                 print("SEEELLLL!!!!")
                 time = datetime.now()
-                quantity = get_wallet_quantity("BB & MACD")
+                quantity = get_wallet_quantity(id,"BB & MACD")
                 r = requests.post('http://localhost:3014/api/order', json={
+                    "wallet_id": id,
                     "timestamp": str(time),
                     "type":"SELL",
                     "name": name,
@@ -444,7 +446,7 @@ def bollinger_macd_buy_sell(name, data, end):
                     "price": float(curr_close),
                     "method": "BB & MACD"
                 })
-                selling_rebalance(str(float(quantity)*float(curr_close)),"BB & MACD")
+                selling_rebalance(id,str(float(quantity)*float(curr_close)),"BB & MACD")
                 hodling = False
             else:
                 print("U dont own any coins/stocks atm to sell!")
@@ -453,32 +455,33 @@ def bollinger_macd_buy_sell(name, data, end):
     else:
         print('Wait, still speculating!')
 
-def create_wallet(name, balance, method):
-    requests.post('http://localhost:3014/api/createWallet', json={"name":name,"balance":balance,"method":method})
 
-def get_wallet_balance(method):
-    r = requests.get('http://localhost:3014/api/getWallet', json={"method":method})
+def create_wallet(id,name, balance, method):
+    requests.post('http://localhost:3014/api/createWallet', json={"id":id,"name":name,"balance":balance,"method":method})
+
+def get_wallet_balance(id,method):
+    r = requests.get('http://localhost:3014/api/getWallet', json={"id":id, "method":method})
     return r.json()['data'][0]['balance']
 
-def buying_rebalance(buying_price, quantity, method):
-    balance = float(get_wallet_balance(method))
+def buying_rebalance(id,buying_price, quantity, method):
+    balance = float(get_wallet_balance(id,method))
     rebalance1 = balance/buying_price
     rebalance = float(balance - (rebalance1*float(buying_price)))
     if rebalance < 1:
         rebalance = "0"
     requests.post('http://localhost:3014/api/rebalance', json={"rebalance": rebalance, "quantity":quantity, "method":method})
 
-def selling_rebalance(revenue, method):
-    balance = get_wallet_balance(method)
+def selling_rebalance(id,revenue, method):
+    balance = get_wallet_balance(id,method)
     rebalance = float(balance) + float(revenue)
     requests.post('http://localhost:3014/api/rebalance', json={"rebalance": rebalance, "quantity":"0", "method":method})
 
-def get_wallet_quantity(method):
-    r = requests.get('http://localhost:3014/api/getWallet', json={"method":method})
+def get_wallet_quantity(id,method):
+    r = requests.get('http://localhost:3014/api/getWallet', json={"id":id, "method":method})
     return r.json()['data'][0]['quantity']
 
-def hodling_check(method):
-    r = requests.get('http://localhost:3014/api/getWallet', json={"method":method})
+def hodling_check(id,method):
+    r = requests.get('http://localhost:3014/api/getWallet', json={"id":id, "method":method})
     if int(r.json()['data'][0]['quantity']) == 0 and int(r.json()['data'][0]['balance']!=0):
         return False
     else:
@@ -487,8 +490,9 @@ def hodling_check(method):
 time = datetime.now()
 dt_string = time.strftime("%Y-%m-%d")
 
-name = sys.argv[1]
-start = sys.argv[2]
+id = sys.argv[1]
+name = sys.argv[2]
+start = sys.argv[3]
 end = str(dt_string)  #sell "2021-04-29" #buy "2020-06-04"
 
 data = get_data(name, start, end)
@@ -503,4 +507,4 @@ data['26_period_ema'] = (data['High'].ewm(span=26, adjust=False).mean() + data['
 data['macd'] = data['12_period_ema'] - data['26_period_ema']
 data['signal_line'] = data['macd'].ewm(span=9, adjust=False).mean()
 
-bollinger_macd_buy_sell(name, data, end)
+bollinger_macd_buy_sell(id,name, data, end)

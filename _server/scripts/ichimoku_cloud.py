@@ -138,22 +138,23 @@ def get_last_date(end):
     last_date_with_value = str('20' + year + '-' + month + '-' + day)
     return last_date_with_value
 
-def ichimoku_cloud_buy_sell(name, curr_close_price, curr_span_a, curr_span_b, curr_kijun, curr_tenkan):
-    hodling = hodling_check("ICHIMOKU CLOUD")
+def ichimoku_cloud_buy_sell(id,name, curr_close_price, curr_span_a, curr_span_b, curr_kijun, curr_tenkan):
+    hodling = hodling_check(id,"ICHIMOKU CLOUD")
     if curr_close_price > curr_span_a and curr_close_price > curr_span_b:
         if abs(curr_kijun-curr_tenkan) >= 0 and abs(curr_kijun-curr_tenkan) <= 2.5:
             print("BUUUUY!!!")
             print('Bought at the price of:',curr_close_price,'$')
             time = datetime.now()
             r = requests.post('http://localhost:3014/api/order', json={
+                    "wallet_id": id,
                     "timestamp": str(time),
                     "type":"BUY",
                     "name": name,
-                    "quantity": str(float(get_wallet_balance("ICHIMOKU CLOUD"))/curr_close_price),
+                    "quantity": str(float(get_wallet_balance(id,"ICHIMOKU CLOUD"))/curr_close_price),
                     "price":float(curr_close_price),
                     "method": "ICHIMOKU CLOUD"
             })
-            buying_rebalance(curr_close_price, str(float(get_wallet_balance("ICHIMOKU CLOUD"))/curr_close_price), "ICHIMOKU CLOUD")
+            buying_rebalance(id,curr_close_price, str(float(get_wallet_balance(id,"ICHIMOKU CLOUD"))/curr_close_price), "ICHIMOKU CLOUD")
             print(r.json())
             hodling = True
         else:
@@ -165,8 +166,9 @@ def ichimoku_cloud_buy_sell(name, curr_close_price, curr_span_a, curr_span_b, cu
                     print("SEEEELLL!!!!")
                     print('Sold at the price of:',curr_close_price,'$')
                     time = datetime.now()
-                    quantity = get_wallet_quantity("ICHIMOKU CLOUD")
+                    quantity = get_wallet_quantity(id,"ICHIMOKU CLOUD")
                     r = requests.post('http://localhost:3014/api/order', json={
+                            "wallet_id": id,
                             "timestamp": str(time),
                             "type":"SELL",
                             "name": name,
@@ -174,7 +176,7 @@ def ichimoku_cloud_buy_sell(name, curr_close_price, curr_span_a, curr_span_b, cu
                             "price": float(curr_close_price),
                             "method": "ICHIMOKU CLOUD"
                     })
-                    selling_rebalance(str(float(quantity)*float(curr_close_price)),"ICHIMOKU CLOUD")
+                    selling_rebalance(id,str(float(quantity)*float(curr_close_price)),"ICHIMOKU CLOUD")
                     hodling=False
                 else:
                     print("Watch for conversion and base line! Might sell soon!")
@@ -453,32 +455,33 @@ def bollinger_macd_buy_sell(name, data, end):
     else:
         print('Wait, still speculating!')
 
-def create_wallet(name, balance, method):
-    requests.post('http://localhost:3014/api/createWallet', json={"name":name,"balance":balance,"method":method})
 
-def get_wallet_balance(method):
-    r = requests.get('http://localhost:3014/api/getWallet', json={"method":method})
+def create_wallet(id,name, balance, method):
+    requests.post('http://localhost:3014/api/createWallet', json={"id":id,"name":name,"balance":balance,"method":method})
+
+def get_wallet_balance(id,method):
+    r = requests.get('http://localhost:3014/api/getWallet', json={"id":id, "method":method})
     return r.json()['data'][0]['balance']
 
-def buying_rebalance(buying_price, quantity, method):
-    balance = float(get_wallet_balance(method))
+def buying_rebalance(id,buying_price, quantity, method):
+    balance = float(get_wallet_balance(id,method))
     rebalance1 = balance/buying_price
     rebalance = float(balance - (rebalance1*float(buying_price)))
     if rebalance < 1:
         rebalance = "0"
     requests.post('http://localhost:3014/api/rebalance', json={"rebalance": rebalance, "quantity":quantity, "method":method})
 
-def selling_rebalance(revenue, method):
-    balance = get_wallet_balance(method)
+def selling_rebalance(id,revenue, method):
+    balance = get_wallet_balance(id,method)
     rebalance = float(balance) + float(revenue)
     requests.post('http://localhost:3014/api/rebalance', json={"rebalance": rebalance, "quantity":"0", "method":method})
 
-def get_wallet_quantity(method):
-    r = requests.get('http://localhost:3014/api/getWallet', json={"method":method})
+def get_wallet_quantity(id,method):
+    r = requests.get('http://localhost:3014/api/getWallet', json={"id":id, "method":method})
     return r.json()['data'][0]['quantity']
 
-def hodling_check(method):
-    r = requests.get('http://localhost:3014/api/getWallet', json={"method":method})
+def hodling_check(id,method):
+    r = requests.get('http://localhost:3014/api/getWallet', json={"id":id, "method":method})
     if int(r.json()['data'][0]['quantity']) == 0 and int(r.json()['data'][0]['balance']!=0):
         return False
     else:
@@ -487,8 +490,9 @@ def hodling_check(method):
 time = datetime.now()
 dt_string = time.strftime("%Y-%m-%d")
 
-name = sys.argv[1]
-start = sys.argv[2]
+id = sys.argv[1]
+name = sys.argv[2]
+start = sys.argv[3]
 end = str(dt_string)  #sell "2020-08-19" #buy "2020-07-07"
 
 data = get_data(name, start, end)
@@ -506,4 +510,4 @@ data['chikou_span'] = data['Close'].shift(-26)
 last_date_with_value = get_last_date(end)
 
 curr_close_price, curr_span_a, curr_span_b, curr_kijun, curr_tenkan = get_latest_data(data,last_date_with_value)
-ichimoku_cloud_buy_sell(name, curr_close_price, curr_span_a, curr_span_b, curr_kijun, curr_tenkan)
+ichimoku_cloud_buy_sell(id,name, curr_close_price, curr_span_a, curr_span_b, curr_kijun, curr_tenkan)
