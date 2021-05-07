@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import {MarketService} from '../../services/market.service';
 
 @Component({
   selector: 'app-graph',
@@ -7,9 +8,10 @@ import { Component, OnInit } from '@angular/core';
 })
 export class GraphComponent implements OnInit {
 
-  constructor() { }
+  constructor(public market: MarketService) { }
 
   ngOnInit(): void {
+
   }
 
 }
