@@ -1,9 +1,11 @@
 import yfinance as yf
 from datetime import datetime
+import os
 
 def get_data(name_, start_, end_):
     data = yf.download(name_, start=start_, end=end_)
-    print(data)
+    pathic = os.path.dirname(os.path.abspath(__file__))
+    data.to_csv(pathic + '\\data\\' + '{}.csv'.format(name_))
     return data
 
 time = datetime.now()
