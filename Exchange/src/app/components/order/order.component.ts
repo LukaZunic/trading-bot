@@ -16,9 +16,16 @@ export class OrderComponent implements OnInit {
 
   ngOnInit(): void {
 
-    this.market.initializeBot('BTC', 'MACD', 10000).pipe(
-      tap(data => console.log(data))
-    ).subscribe();
+  }
+
+  // tslint:disable-next-line:typedef
+  startBot(){
+
+    console.log('starting bot');
+
+    this.market.initializeBot('DOGE-USD', 'MACD', 10000).subscribe(
+      (data) => console.log(data)
+    );
 
   }
 
