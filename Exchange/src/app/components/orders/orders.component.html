@@ -1,17 +1,17 @@
 
-<mat-card *ngIf="orders$ | async as orders" class="fw-bold m-a-l" style="width: 18%; max-width: 400px;">
+<mat-card *ngIf="orders$ | async as orders" class="scrollable-content fw-bold m-a-l m-b-s flex fw-nowrap" style="width: 18%; max-width: 400px; height: 290px;">
 
   <mat-card-header>
     <div mat-card-avatar>
       <mat-icon style="font-size: 36px;">
-        inventory
+        fact_check
       </mat-icon>
     </div>
     <mat-card-title>
       Orders
     </mat-card-title>
     <mat-card-subtitle>
-      Click order for more details
+      Select order for more details
     </mat-card-subtitle>
   </mat-card-header>
 

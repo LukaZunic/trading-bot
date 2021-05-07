@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { MarketService } from '../../services/market.service';
 import {Observable} from 'rxjs';
+import {map} from 'rxjs/operators';
 
 @Component({
   selector: 'app-wallet',
@@ -9,12 +10,14 @@ import {Observable} from 'rxjs';
 })
 export class WalletComponent implements OnInit {
 
-  wallet$: Observable<any>;
+  wallets$: Observable<any>;
 
   constructor(public market: MarketService) { }
 
   ngOnInit(): void {
-    this.wallet$ = this.market.wallet$;
+    this.wallets$ = this.market.wallet$.pipe(
+      map(data => data.data)
+    );
   }
 
 

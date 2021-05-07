@@ -18,5 +18,17 @@ export class MarketService {
   }
 
 
+  initializeBot(crypto: string, method: string, balance: number): Observable<any> {
+
+    // this.http.post(`http://localhost:3014/api/${bot}/script`, );
+    return this.http.post<any>(`http://localhost:3014/api/createWallet`, {
+        name: crypto,
+        balance,
+        method
+    });
+
+  }
+
+
 
 }

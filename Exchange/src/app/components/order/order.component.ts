@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { MarketService } from '../../services/market.service';
 import {Observable} from 'rxjs';
+import {tap} from 'rxjs/operators';
 
 @Component({
   selector: 'app-order',
@@ -9,12 +10,16 @@ import {Observable} from 'rxjs';
 })
 export class OrderComponent implements OnInit {
 
-  orderData$: Observable<any>;
-  constructor(public order: MarketService) { }
+  order$: Observable<any>;
+
+  constructor(public market: MarketService) { }
 
   ngOnInit(): void {
-    this.orderData$ = this.order.orderData$;
-    console.log(this.orderData$);
+
+    this.market.initializeBot('BTC', 'MACD', 10000).pipe(
+      tap(data => console.log(data))
+    ).subscribe();
+
   }
 
 }
