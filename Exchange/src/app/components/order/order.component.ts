@@ -20,13 +20,10 @@ export class OrderComponent implements OnInit {
 
   // tslint:disable-next-line:typedef
   startBot(){
-
     console.log('starting bot');
-
     this.market.initializeBot('DOGE-USD', 'MACD', 10000).subscribe(
       (data) => console.log(data)
     );
-
   }
 
 }

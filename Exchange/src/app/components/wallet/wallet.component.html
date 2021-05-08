@@ -1,4 +1,6 @@
 
+
+
 <mat-card *ngIf="wallets$ | async as wallets" class="scrollable-content fw-bold m-t-s m-l-l m-b-l flex fw-nowrap" style="width: 25%; max-width: 400px; height: 500px;">
 
   <mat-card-header>
@@ -8,19 +10,22 @@
       </mat-icon>
     </div>
     <mat-card-title>
-      Active bots
+      Bot Wallets
     </mat-card-title>
     <mat-card-subtitle>
       Select bot for more details
     </mat-card-subtitle>
   </mat-card-header>
 
+  <button mat-raised-button (click)="createWallet()">New wallet</button>
+
   <mat-card-content>
     <mat-list *ngFor="let wallet of wallets | keyvalue">
       <mat-list-item>
         ${{wallet.value.balance}}
         {{wallet.value.name}}
-        {{wallet.value.method}}
+        {{wallet.value.method}}<br>
+        ID: {{wallet.value.id}}
       </mat-list-item>
     </mat-list>
   </mat-card-content>

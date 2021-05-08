@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import {tap} from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -18,20 +19,23 @@ export class MarketService {
   }
 
   initializeBot(crypto: string, method: string, balance: number): Observable<any> {
-
-    // this.http.post(`http://localhost:3014/api/${bot}/script`, );
-    // return this.http.post<any>(`http://localhost:3014/api/createWallet`, {
-    //     name: crypto,
-    //     balance,
-    //     method
-    // });
-
     // const date = new Date().toISOString().slice(0, 10);
-
     return this.http.post(`http://localhost:3014/api/${method}/start`, {
         name: crypto,
         start_date: '2020-01-01'
     });
+  }
+
+
+  // tslint:disable-next-line:typedef
+  createWallet(crypto: string, method: string, balance: number){
+    return this.http.post<any>(`http://localhost:3014/api/createWallet`, {
+        name: crypto,
+        balance,
+        method
+    }).pipe(
+      tap(data => console.log('creating new wallet', data))
+    );
 
   }
 

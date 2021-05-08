@@ -20,6 +20,11 @@ export class WalletComponent implements OnInit {
     );
   }
 
+  // tslint:disable-next-line:typedef
+  createWallet(){
+    this.market.createWallet('BTC-USD', 'MACD', 10000).subscribe();
+  }
+
 
 
 }
