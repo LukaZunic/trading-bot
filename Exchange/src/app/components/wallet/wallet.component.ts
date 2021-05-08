@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { MarketService } from '../../services/market.service';
 import {Observable} from 'rxjs';
 import {map} from 'rxjs/operators';
+import {FormControl, FormGroup} from '@angular/forms';
 
 @Component({
   selector: 'app-wallet',
@@ -12,7 +13,15 @@ export class WalletComponent implements OnInit {
 
   wallets$: Observable<any>;
 
-  constructor(public market: MarketService) { }
+  form: FormGroup;
+
+  new = false;
+
+  constructor(public market: MarketService) {
+    this.form = new FormGroup({
+      currency: new FormControl('')
+    });
+  }
 
   ngOnInit(): void {
     this.wallets$ = this.market.wallet$.pipe(

@@ -36,7 +36,6 @@ export class MarketService {
     }).pipe(
       tap(data => console.log('creating new wallet', data))
     );
-
   }
 
 

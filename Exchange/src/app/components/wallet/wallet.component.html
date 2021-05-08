@@ -1,6 +1,4 @@
 
-
-
 <mat-card *ngIf="wallets$ | async as wallets" class="scrollable-content fw-bold m-t-s m-l-l m-b-l flex fw-nowrap" style="width: 25%; max-width: 400px; height: 500px;">
 
   <mat-card-header>
@@ -17,9 +15,11 @@
     </mat-card-subtitle>
   </mat-card-header>
 
-  <button mat-raised-button (click)="createWallet()">New wallet</button>
+  <button mat-raised-button (click)="this.new=!this.new">
+    {{this.new ? 'Cancel' : 'Create New'}}
+  </button>
 
-  <mat-card-content>
+  <mat-card-content *ngIf="!new else create">
     <mat-list *ngFor="let wallet of wallets | keyvalue">
       <mat-list-item>
         ${{wallet.value.balance}}
@@ -30,5 +30,20 @@
     </mat-list>
   </mat-card-content>
 
+  <ng-template #create>
+    <mat-card-content>
+      <form [formGroup]="form">
+        <mat-form-field >
+          <mat-label>First name</mat-label>
+          <input formControlName="currency" matInput>
+        </mat-form-field>
+      </form>
+
+      <button mat-raised-button (click)="createWallet()">New wallet</button>
+
+    </mat-card-content>
+  </ng-template>
+
 </mat-card>
+
 

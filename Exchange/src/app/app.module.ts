@@ -21,6 +21,10 @@ import {MatButtonModule} from '@angular/material/button';
 import {MatCardModule} from '@angular/material/card';
 import {MatSliderModule} from '@angular/material/slider';
 import {MatListModule} from '@angular/material/list';
+import {ReactiveFormsModule} from '@angular/forms';
+import {MatSelectModule} from '@angular/material/select';
+import {MatInputModule} from '@angular/material/input';
+
 
 
 
@@ -45,7 +49,10 @@ import {MatListModule} from '@angular/material/list';
     MatButtonModule,
     MatSliderModule,
     MatCardModule,
-    MatListModule
+    MatListModule,
+    ReactiveFormsModule,
+    MatSelectModule,
+    MatInputModule
   ],
   providers: [
     HttpClientModule
