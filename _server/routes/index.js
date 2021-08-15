@@ -23,7 +23,7 @@ router.post('/api/ichimoku/start',      ichimoku.startichimoku);
 
 /* MACD */
 router.post('/api/macd/script',         macd.macd);
-router.post('/api/macd/start',          macd.startmacd);
+router.post('/api/macd/start',         macd.startmacd);
 
 /* MACD & BOLLINGER BANDS */
 router.post('/api/macdboll/script',     macdboll.macdboll);

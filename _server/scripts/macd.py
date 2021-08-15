@@ -1,9 +1,12 @@
 import numpy as np
+from numpy.core.fromnumeric import take
 import pandas as pd
 import yfinance as yf
 import requests
 from datetime import datetime
 import sys
+
+
 
 def get_data(name_, start_, end_):
     data = yf.download(name_, start=start_, end=end_)
@@ -45,7 +48,7 @@ def get_last_date(end):
     return last_date_with_value
 
 
-def macd_buy_sell(id_,name, end, data):
+def macd_buy_sell(id_,name, end, stop_loss, take_profit, data):
     hodling = hodling_check(id_, "MACD")
     last_date = get_last_date(end)
     date_before_last = get_last_date(last_date)
@@ -54,10 +57,14 @@ def macd_buy_sell(id_,name, end, data):
     curr_close = data.loc[last_date]['Close']
     prev_macd_line = data.loc[date_before_last]['macd']
     prev_signal_line = data.loc[date_before_last]['signal_line']
+    balance = get_wallet_balance(id_,"MACD")
+    
+    if str(balance) <= str(stop_loss) or str(balance) >= str(take_profit):
+        print("TERMINATE TRADING BOT")
     if prev_macd_line == prev_signal_line or abs(prev_macd_line - prev_signal_line) < 0.5:
         if curr_macd_line < curr_signal_line:
             if hodling==True:
-                print("SEEEELLL!!!!")
+                print("SELL!")
                 print('Sold at the price of:',curr_close,'$')
                 time = datetime.now()
                 quantity = get_wallet_quantity(id_,"MACD")
@@ -74,7 +81,7 @@ def macd_buy_sell(id_,name, end, data):
                 hodling=False
         else:
             if hodling==False:
-                print("BUUUUUYY!!!!")
+                print("BUY!")
                 print('Bought at the price of:',curr_close,'$')
                 time = datetime.now()
                 r = requests.post('http://localhost:3014/api/order', json={
@@ -130,6 +137,8 @@ dt_string = time.strftime("%Y-%m-%d")
 id_ = sys.argv[1]
 name = sys.argv[2]
 start = sys.argv[3]
+stop_loss = sys.argv[4]
+take_profit = sys.argv[5]
 end = str(dt_string)  #sell "2020-06-27" #buy "2020-05-08"
 
 data = get_data(name, start, end)
@@ -138,5 +147,4 @@ data['26_period_ema'] = (data['High'].ewm(span=26, adjust=False).mean() + data['
 data['macd'] = data['12_period_ema'] - data['26_period_ema']
 data['signal_line'] = data['macd'].ewm(span=9, adjust=False).mean()
 
-
-macd_buy_sell(id_,name, end, data)
+macd_buy_sell(id_, name, end, stop_loss, take_profit, data)
