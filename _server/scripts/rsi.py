@@ -1,16 +1,15 @@
-from _server.scripts.ichimoku_cloud import buying_rebalance, get_wallet_balance
 import json
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
+
 from datetime import datetime
 import sys
 
 import requests
 import yfinance as yf
-nt = None  # default='warn'
+#nt = None  # default='warn'
 
-pd.options.mode.chained_assignment = None  # default='warn'
+#pd.options.mode.chained_assignment = None  # default='warn'
 
    
 def fillMoves(data):
@@ -68,16 +67,7 @@ def fillRsi(data):
     for _day in range(11,len(_data)):
         _data['RSI'][_day] = 100 - (100/ (1+_data['RS'][_day]))
     return _data    
-    
-def pltRsi(data):
-    fig,axs = plt.subplots(2, sharex=True, figsize=(13,9))
-    fig.suptitle('BTC Stock Price (top) - 10 day RSI (bottom)')
-    axs[0].plot(data['Adj Close'])
-    axs[1].plot(data['RSI'])
-    axs[1].axhline(y=70,color='r',linestyle='-')
-    axs[1].axhline(y=30,color='r',linestyle='-')
-    axs[0].grid()
-    axs[1].grid()
+
     
 
 def calculateSignals(id_, name_, data):
@@ -148,28 +138,6 @@ def calculateSignals(id_, name_, data):
     return _data 
 
 
-def pltSignals(data):
-    _data = data
-    fig, axs = plt.subplots(2, sharex=True, figsize=(13,9))
-    fig.suptitle('Stock price(top) & 10day RSI(bottom)')
-
-    ## Chart the stock close price & buy/sell signals:
-    axs[0].scatter(_data.index, _data['Buy Signal'], color='green', marker='^', alpha=1)
-    axs[0].scatter(_data.index, _data['Sell Signal'], color='red', marker='v', alpha=1)
-
-    axs[0].plot(_data['Adj Close'], alpha = 0.8)
-    axs[0].grid()
-
-    ## Chart RSI & buy/sell signals:
-    axs[1].scatter(_data.index, _data['Buy RSI'], color='green', marker='^', alpha=1)
-    axs[1].scatter(_data.index, _data['Sell RSI'], color='red', marker='v', alpha=1)
-    axs[1].axhline(y=70,color='r',linestyle='-')
-    axs[1].axhline(y=30,color='r',linestyle='-')
-
-    axs[1].plot(_data['RSI'], alpha = 0.8)
-    axs[1].grid()
-    return _data
-
 def calculateRsi(data):
     data = fillMoves(data)
     for _day in range (1,len(data)):
@@ -226,7 +194,7 @@ def rsi(id_, name_, data_, end):
 
     data = calculateRsi(data)
 
-    pltRsi(data)
+   
 
     # Calculate the buy & sell signals
     ## Initialize the columns that we need
@@ -239,22 +207,22 @@ def rsi(id_, name_, data_, end):
 
     
     data = calculateSignals(id_, name_, data)
-    pltSignals(data)
-    ## Trade Performance
-    trade_count = data['Buy Signal'].count()
-
-    ## Avg Profit per trade
-
-    average_profit = ((data['Strategy'][-1] / data['Strategy'][11]) ** (1/trade_count)) - 1
-
-    ## Number of days per trade
-    total_days = data['Long Tomorrow'].count()
-    average_days = int(total_days/trade_count)
-
-    print('Strategy yield', trade_count, 'trades')
-    print('Avrage trade lasted', average_days, 'days per trade')
-    print('Average profit per trade was', average_profit*100, '%')
-    #data.to_excel("RSI_data_table.xlsx")
+    
+    ### Trade Performance
+    #trade_count = data['Buy Signal'].count()
+#
+    ### Avg Profit per trade
+#
+    #average_profit = ((data['Strategy'][-1] / data['Strategy'][11]) ** (1/trade_count)) - 1
+#
+    ### Number of days per trade
+    #total_days = data['Long Tomorrow'].count()
+    #average_days = int(total_days/trade_count)
+#
+    #print('Strategy yield', trade_count, 'trades')
+    #print('Avrage trade lasted', average_days, 'days per trade')
+    #print('Average profit per trade was', average_profit*100, '%')
+    ##data.to_excel("RSI_data_table.xlsx")
 
 def get_data(name_, start_, end_):
     data = yf.download(name_, start=start_, end=end_)
