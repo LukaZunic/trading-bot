@@ -381,3 +381,87 @@ def bollinger_macd_buy_sell(data, end, hodling):
                 print("U dont own any coins/stocks atm to sell!")
     else:
         print('Wait, still speculating!')
+
+
+
+
+pd.options.mode.chained_assignment = None  # default='warn'
+
+def calculateRsi(data):
+
+        #Column initialization
+    data['Up Move'] = np.nan
+    data['Down Move'] = np.nan
+    data['Average Up'] = np.nan
+    data['Average Down'] = np.nan
+
+    # Relative Strength
+    data['RS'] = np.nan
+
+    # Relative Strength Index
+    data['RSI'] = np.nan
+
+    fillRsi(data)
+
+
+    return data
+
+
+
+
+    ## Fills UP&Down Moves
+def fillMoves(data):
+    for x in range(1, len(data)):
+        data['Up Move'][x] = 0
+        data['Down Move'][0] = 0
+
+        if data['Adj Close'][x] > data['Adj Close'][x-1]:
+            data['Up Move'][x] = data['Adj Close'][x] - data['Adj Close'][x-1]
+
+        if data['Adj Close'][x] < data['Adj Close'][x-1]:
+            data['Down Move'][x] = abs(data['Adj Close'][x] - data['Adj Close'][x-1])
+
+    return data
+
+
+def fillAverages(data):
+
+    data = fillMoves(data)
+
+    ## First 10days Avg
+    data['Average Up'][10] = data['Up Move'][1:11].mean()
+    data['Average Down'][10] = data['Down Move'][1:11].mean()
+
+    ## Rest Avgs
+    for _day in range(11,len(data)):
+        _previousDay = _day-1
+        
+        data['Average Up'][_day] = (data['Average Up'][_previousDay]*9 + data['Up Move'][_day])/10
+        data['Average Down'][_day] = (data['Average Down'][_previousDay]*9 + data['Down Move'][_day])/10 
+
+    return data
+
+
+def fillRelativeStrength(data):
+    data = fillAverages(data)
+
+    ## First 10days RS
+    data['RS'][10] = data['Average Up'][10] / data['Average Down'][10]
+
+    ## Rest RelativeStrengths
+    for _day in range(11,len(data)):
+        data['RS'][_day] = data['Average Up'][_day] / data['Average Down'][_day]
+
+    return data    
+
+def fillRsi(data):
+    data = fillRelativeStrength(data)
+
+    # First 10Days RSI
+    data['RSI'][10] = 100 - (100 / (1 + data['RS'][10]))
+
+    # Rest RSIs
+    for _day in range(11,len(data)):
+        data['RSI'][_day] = 100 - (100/ (1+data['RS'][_day]))
+
+    return data 
