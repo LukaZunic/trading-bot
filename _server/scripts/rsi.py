@@ -1,8 +1,12 @@
+from _server.scripts.ichimoku_cloud import buying_rebalance, get_wallet_balance
+import json
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from datetime import datetime
 import sys
+
+import requests
 import yfinance as yf
 nt = None  # default='warn'
 
@@ -76,7 +80,7 @@ def pltRsi(data):
     axs[1].grid()
     
 
-def calculateSignals(data):
+def calculateSignals(id_, name_, data):
     _data = data
     for _day in range(11,len(_data)):
         _previousDay = _day - 1
@@ -88,15 +92,48 @@ def calculateSignals(data):
         else:
             _data['Long Tomorrow'][_day] = False
         
+        hodling = hodling_check(id_,"RSI")
         # Calculate "Buy Signal" column
         if ((_data['Long Tomorrow'][_day]==True) & (_data['Long Tomorrow'][_previousDay]==False)):
             _data['Buy Signal'][_day] = _data['Adj Close'][_day]
             _data['Buy RSI'][_day] = _data['RSI'][_day]
+            time = datetime.now()
+            print('BUYYYY!!!!! RSII !!!!!')
+            print('Bought at the price of:', _data['Close'][_day],'$')
+            r = requests.post('http://localhost:3014/api/order', json={
+                "wallet_id" : id_,
+                "timestamp" : str(time),
+                "type": "BUY",
+                "name": name_,
+                "quantity": str(float(get_wallet_balance(id_,"RSI"))/_data['Close'][_day]),
+                "price":float(_data['Close'][_day]),
+                "method":"RSI"
+            })
+            buying_rebalance(id_, _data['Close'][_day],str(float(get_wallet_balance(id_,"RSI"))/_data['Close'][_day]), "RSI")
+            print(r.json())
+            hodling = True
 
         # Calculate "Sell Signal" column
-        if((_data['Long Tomorrow'][_day]==False) & (_data['Long Tomorrow'][_previousDay]==True)):
-            _data['Sell Signal'][_day] = _data['Adj Close'][_day]
-            _data['Sell RSI'][_day] = _data['RSI'][_day]
+        if hodling==True:
+            if((_data['Long Tomorrow'][_day]==False) & (_data['Long Tomorrow'][_previousDay]==True)):
+                _data['Sell Signal'][_day] = _data['Adj Close'][_day]
+                _data['Sell RSI'][_day] = _data['RSI'][_day]
+                print('SELLLLLL!!!! RSI!!!')
+                print('Sold at the price of:', _data['Close'][_day])
+                time = datetime.now()
+                quantity = get_wallet_quantity(id_,"RSI")
+                r = requests.post('http://localhost:3014/api/order', json={
+                    "wallet_id" : id_,
+                    "timestamp" : str(time),
+                    "type": "SELL",
+                    "name": name_,
+                    "quantity": str(quantity),
+                    "price":float(_data['Close'][_day]),
+                    "method":"RSI"
+                })
+                selling_rebalance(id_,str(float(quantity)*float(_data['Close'][_day])),"RSI")
+                hodling=False
+
         
     ## Calculate Strategy Perfomance
     _data['Strategy'][11] = _data['Adj Close'][11]
@@ -141,7 +178,40 @@ def calculateRsi(data):
     data = fillRsi(data)
     return data
 
-def rsi(name, data_, end):
+
+def create_wallet(id_,name, balance, method):
+    requests.post('http://localhost:3014/api/createWallet', json={"id":id_,"name":name,"balance":balance,"method":method})
+
+def get_wallet_balance(id_,method):
+    r = requests.get('http://localhost:3014/api/getWallet', json={"id":id_, "method":method})
+    return r.json()['data'][0]['balance']
+
+def buying_rebalance(id_,buying_price, quantity, method):
+    balance = float(get_wallet_balance(id_,method))
+    rebalance1 = balance/buying_price
+    rebalance = float(balance - (rebalance1*float(buying_price)))
+    if rebalance < 1:
+        rebalance = "0"
+    requests.post('http://localhost:3014/api/rebalance', json={"rebalance": rebalance, "quantity":quantity, "method":method})
+
+def selling_rebalance(id_,revenue, method):
+    balance = get_wallet_balance(id_,method)
+    rebalance = float(balance) + float(revenue)
+    requests.post('http://localhost:3014/api/rebalance', json={"rebalance": rebalance, "quantity":"0", "method":method})
+
+def get_wallet_quantity(id_,method):
+    r = requests.get('http://localhost:3014/api/getWallet', json={"id":id_, "method":method})
+    return r.json()['data'][0]['quantity']
+
+def hodling_check(id_,method):
+    r = requests.get('http://localhost:3014/api/getWallet', json={"id":id_, "method":method})
+    if int(r.json()['data'][0]['quantity']) == 0 and int(r.json()['data'][0]['balance'])!=0:
+        return False
+    else:
+        return True
+
+
+def rsi(id_, name_, data_, end):
     data = data_
     
     data['Down Move'] = np.nan
@@ -168,7 +238,7 @@ def rsi(name, data_, end):
     data['Strategy'] = np.nan
 
     
-    data = calculateSignals(data)
+    data = calculateSignals(id_, name_, data)
     pltSignals(data)
     ## Trade Performance
     trade_count = data['Buy Signal'].count()
@@ -193,10 +263,12 @@ def get_data(name_, start_, end_):
 time = datetime.now()
 dt_string = time.strftime("%Y-%m-%d")
 
-name = sys.argv[1]
-start = sys.argv[2]
+
+id_ = sys.argv[1]
+name = sys.argv[2]
+start = sys.argv[3]
 end = str(dt_string)  #sell "2021-04-29" #buy "2020-06-04"
 
 data = get_data(name,start,end)
 
-rsi(name,data,end)
+rsi(id_,name,data,end)
