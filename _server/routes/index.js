@@ -5,7 +5,9 @@ var wallet            = require('./wallet.js');
 var ichimoku          = require('./ichimoku.js');  
 var macd              = require('./macd.js');
 var macdboll          = require('./macdboll.js');
+var rsi               = require('./rsi.js')
 var market            = require('./market.js');
+
 
 /* ORDER */
 router.post('/api/order',               order.order);
@@ -29,7 +31,14 @@ router.post('/api/macd/start',         macd.startmacd);
 router.post('/api/macdboll/script',     macdboll.macdboll);
 router.post('/api/macdboll/start',      macdboll.startmacdboll);
 
+
+/* RSI */
+router.post('/api/rsi/script',          rsi.rsi);
+router.post('/api/rsi/start',           rsi.startrsi);
+
 /* MARKET */
 router.get('/api/market',               market.market);
+
+
 
 module.exports = router;

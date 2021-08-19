@@ -70,6 +70,8 @@ def pltRsi(data):
     fig.suptitle('BTC Stock Price (top) - 10 day RSI (bottom)')
     axs[0].plot(data['Adj Close'])
     axs[1].plot(data['RSI'])
+    axs[1].axhline(y=70,color='r',linestyle='-')
+    axs[1].axhline(y=30,color='r',linestyle='-')
     axs[0].grid()
     axs[1].grid()
     
@@ -124,6 +126,8 @@ def pltSignals(data):
     ## Chart RSI & buy/sell signals:
     axs[1].scatter(_data.index, _data['Buy RSI'], color='green', marker='^', alpha=1)
     axs[1].scatter(_data.index, _data['Sell RSI'], color='red', marker='v', alpha=1)
+    axs[1].axhline(y=70,color='r',linestyle='-')
+    axs[1].axhline(y=30,color='r',linestyle='-')
 
     axs[1].plot(_data['RSI'], alpha = 0.8)
     axs[1].grid()
