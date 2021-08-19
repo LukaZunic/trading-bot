@@ -3,3 +3,5 @@ config.py
 /__pycache__
 
 /_server/node_modules
+
+/Exchange/node_modules

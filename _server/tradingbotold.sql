@@ -1,10 +1,3 @@
--- --------------------------------------------------------
--- Host:                         127.0.0.1
--- Server version:               10.4.17-MariaDB - mariadb.org binary distribution
--- Server OS:                    Win64
--- HeidiSQL Version:             11.2.0.6213
--- --------------------------------------------------------
-
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET NAMES utf8 */;
 /*!50503 SET NAMES utf8mb4 */;
@@ -24,22 +17,32 @@ CREATE TABLE IF NOT EXISTS `order` (
   `name` varchar(50) DEFAULT NULL,
   `quantity` double DEFAULT NULL,
   `price` double DEFAULT NULL,
-  `method` varchar(50) DEFAULT NULL,
-  `wallet_id` varchar(50) DEFAULT NULL
+  `method` varchar(50) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- Data exporting was unselected.
+-- Dumping data for table tradingbot.order: ~3 rows (approximately)
+/*!40000 ALTER TABLE `order` DISABLE KEYS */;
+INSERT INTO `order` (`timestamp`, `type`, `name`, `quantity`, `price`, `method`) VALUES
+	('2021-04-28 19:32:46.172681', 'BUY', 'NKLA', 673.4006561022246, 14.850000381469727, 'MACD'),
+	('2021-04-28 19:33:06.797453', 'SELL', 'NKLA', 673.4006561022246, 63.54999923706055, 'MACD'),
+	('2021-04-28 19:34:39.596883', 'BUY', 'NKLA', 3470.7714068395208, 12.329999923706055, 'MACD');
+/*!40000 ALTER TABLE `order` ENABLE KEYS */;
 
 -- Dumping structure for table tradingbot.wallet
 CREATE TABLE IF NOT EXISTS `wallet` (
-  `id` varchar(50) DEFAULT NULL,
   `name` varchar(50) DEFAULT NULL,
   `balance` double DEFAULT NULL,
   `quantity` double DEFAULT NULL,
   `method` varchar(50) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- Data exporting was unselected.
+-- Dumping data for table tradingbot.wallet: ~3 rows (approximately)
+/*!40000 ALTER TABLE `wallet` DISABLE KEYS */;
+INSERT INTO `wallet` (`name`, `balance`, `quantity`, `method`) VALUES
+	('NKLA', 0, 0, 'MACD'),
+	('NKLA', 10000, 0, 'ICHIMOKU CLOUD'),
+	('NKLA', 10000, 0, 'BB & MACD');
+/*!40000 ALTER TABLE `wallet` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
