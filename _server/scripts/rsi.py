@@ -1,22 +1,27 @@
-import json
 import pandas as pd
 import numpy as np
-
+import yfinance as yf
+import requests
 from datetime import datetime
 import sys
 
-import requests
-import yfinance as yf
-#nt = None  # default='warn'
 
-#pd.options.mode.chained_assignment = None  # default='warn'
+
+nt = None  # default='warn'
+
+pd.options.mode.chained_assignment = None  # default='warn'
 
    
-def fillMoves(data):
+def fillMoves(_data):
+    
+    data = _data
     for _day in range(1, len(data)):
+        
         _previousDay = _day-1
+        
         data['Down Move'][_day] = 0
         data['Up Move'][_day] = 0
+        
 
         if data['Adj Close'][_day] > data['Adj Close'][_previousDay]:
             data['Up Move'][_day] = data['Adj Close'][_day] - data['Adj Close'][_previousDay]
@@ -24,15 +29,14 @@ def fillMoves(data):
 
         if data['Adj Close'][_day] < data['Adj Close'][_previousDay]:
             data['Down Move'][_day] = abs(data['Adj Close'][_day] - data['Adj Close'][_previousDay])
-
     return data
 
 
 def fillAverages(data):
-
     _data = data
     ## First 10days Avg
     _data['Average Up'][10] = _data['Up Move'][1:11].mean()
+
     _data['Average Down'][10] = _data['Down Move'][1:11].mean()
 
     ## Rest Avgs
@@ -66,12 +70,24 @@ def fillRsi(data):
     # Rest RSIs
     for _day in range(11,len(_data)):
         _data['RSI'][_day] = 100 - (100/ (1+_data['RS'][_day]))
-    return _data    
+    return _data   
 
-    
+def stoppers_check(id_,stop_loss, take_profit, curr_close_):
+    curr_close = curr_close_
+    balance = get_wallet_balance(id_,"RSI")
+    if float(balance) == 0:
+        quantity = get_wallet_quantity(id_,"RSI")
+        if (float(quantity) * float(curr_close)) >= float(take_profit) or (float(quantity) * float(curr_close)) <= float(stop_loss):
+            print("TERMINATE TRADING BOT")
 
-def calculateSignals(id_, name_, data):
+    else:
+        if float(balance)>=float(take_profit) or float(balance)<=float(stop_loss):
+            print("TERMINATE TRADING BOT")
+
+
+def calculateSignals(id_, name_, data,stop_loss, take_profit):
     _data = data
+    
     for _day in range(11,len(_data)):
         _previousDay = _day - 1
         # Calculate "Long Tomorrow" column
@@ -83,13 +99,14 @@ def calculateSignals(id_, name_, data):
             _data['Long Tomorrow'][_day] = False
         
         hodling = hodling_check(id_,"RSI")
+        stoppers_check(id_,stop_loss, take_profit, _data['Close'][_day])
         # Calculate "Buy Signal" column
         if ((_data['Long Tomorrow'][_day]==True) & (_data['Long Tomorrow'][_previousDay]==False)):
             _data['Buy Signal'][_day] = _data['Adj Close'][_day]
             _data['Buy RSI'][_day] = _data['RSI'][_day]
             time = datetime.now()
-            print('BUYYYY!!!!! RSII !!!!!')
-            print('Bought at the price of:', _data['Close'][_day],'$')
+            #print('BUYYYY!!!!! RSII !!!!!')
+            #print('Bought at the price of:', _data['Close'][_day],'$')
             r = requests.post('http://localhost:3014/api/order', json={
                 "wallet_id" : id_,
                 "timestamp" : str(time),
@@ -99,8 +116,8 @@ def calculateSignals(id_, name_, data):
                 "price":float(_data['Close'][_day]),
                 "method":"RSI"
             })
-            buying_rebalance(id_, _data['Close'][_day],str(float(get_wallet_balance(id_,"RSI"))/_data['Close'][_day]), "RSI")
-            print(r.json())
+            buying_rebalance(id_, _data['Close'][_day],float(get_wallet_balance(id_,"RSI"))/_data['Close'][_day], "RSI")
+            #print(r.json())
             hodling = True
 
         # Calculate "Sell Signal" column
@@ -108,8 +125,8 @@ def calculateSignals(id_, name_, data):
             if((_data['Long Tomorrow'][_day]==False) & (_data['Long Tomorrow'][_previousDay]==True)):
                 _data['Sell Signal'][_day] = _data['Adj Close'][_day]
                 _data['Sell RSI'][_day] = _data['RSI'][_day]
-                print('SELLLLLL!!!! RSI!!!')
-                print('Sold at the price of:', _data['Close'][_day])
+                #print('SELLLLLL!!!! RSI!!!')
+                #print('Sold at the price of:', _data['Close'][_day])
                 time = datetime.now()
                 quantity = get_wallet_quantity(id_,"RSI")
                 r = requests.post('http://localhost:3014/api/order', json={
@@ -121,7 +138,7 @@ def calculateSignals(id_, name_, data):
                     "price":float(_data['Close'][_day]),
                     "method":"RSI"
                 })
-                selling_rebalance(id_,str(float(quantity)*float(_data['Close'][_day])),"RSI")
+                selling_rebalance(id_,float(quantity)*float(_data['Close'][_day]),"RSI")
                 hodling=False
 
         
@@ -138,11 +155,14 @@ def calculateSignals(id_, name_, data):
     return _data 
 
 
-def calculateRsi(data):
-    data = fillMoves(data)
+def calculateRsi(data1):
+    data = fillMoves(data1)
     for _day in range (1,len(data)):
         if(~(data['Down Move'][_day]>0)):
             data['Down Move'][_day]=0
+    for _day in range (1,len(data)):
+        if(~(data['Up Move'][_day]>0)):
+            data['Up Move'][_day]=0
     data = fillRsi(data)
     return data
 
@@ -179,10 +199,11 @@ def hodling_check(id_,method):
         return True
 
 
-def rsi(id_, name_, data_, end):
+def rsi(id_, name_, data_, stop_loss, take_profit):
     data = data_
     
     data['Down Move'] = np.nan
+    data['Up Move'] = np.nan
     data['Average Up'] = np.nan
     data['Average Down'] = np.nan
         
@@ -192,21 +213,23 @@ def rsi(id_, name_, data_, end):
         # Relative Strength Index
     data['RSI'] = np.nan
 
+    
     data = calculateRsi(data)
 
    
 
     # Calculate the buy & sell signals
     ## Initialize the columns that we need
+    
     data['Long Tomorrow'] = np.nan
     data['Buy Signal'] = np.nan
     data['Sell Signal'] = np.nan
     data['Buy RSI'] = np.nan
     data['Sell RSI'] = np.nan
     data['Strategy'] = np.nan
-
     
-    data = calculateSignals(id_, name_, data)
+    
+    data = calculateSignals(id_, name_, data,stop_loss, take_profit)
     
     ### Trade Performance
     #trade_count = data['Buy Signal'].count()
@@ -235,8 +258,10 @@ dt_string = time.strftime("%Y-%m-%d")
 id_ = sys.argv[1]
 name = sys.argv[2]
 start = sys.argv[3]
+stop_loss = sys.argv[4]
+take_profit = sys.argv[5]
 end = str(dt_string)  #sell "2021-04-29" #buy "2020-06-04"
 
 data = get_data(name,start,end)
 
-rsi(id_,name,data,end)
+rsi(id_,name,data,stop_loss, take_profit)

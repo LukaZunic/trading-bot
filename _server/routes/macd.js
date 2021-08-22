@@ -4,11 +4,13 @@ var pool        = require('../connection');
 var functions    = require('./functions.js');
 var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 
-var check = false;
-var interval;
+
+var intervals = {};
 var macd = {
     stop: (req, res, next) => {
-        clearInterval(req.body.id_macd);
+        clearInterval(intervals[req.body.id_macd]);
+        res.json({ message: `MACD ${req.body.id_macd} bot terminated`})
+        console.log('MACD bot terminated');
     },
     macd: (req, res , next) => {
         const { spawn } = require('child_process');
@@ -17,9 +19,8 @@ var macd = {
         
         childPython.stdout.on('data', (data) => {
             console.log(`stdout: ${data}`);
-            check = data.toString('utf-8').includes("TERMINATE TRADING BOT");
-            if(check == true){
-                clearInterval(interval);
+            if(data.toString('utf-8').includes("TERMINATE TRADING BOT")){
+                clearInterval(intervals[req.body.id_macd]);
                 console.log('MACD bot terminated');
             }
         });
@@ -29,7 +30,7 @@ var macd = {
         childPython.on('close', (code) => {
             console.log(`child process exited with code: ${code}`);
         });
-        res.json({ message: 'MACD called'});
+        res.json({ message: `MACD script called at ID: ${req.body.id_macd}`});
     },
     
     startmacd: (req, res, next) => {
@@ -39,27 +40,14 @@ var macd = {
         var stop_loss=req.body.stop_loss;
         var take_profit=req.body.take_profit;
         
-        interval = setInterval(()=>{
-                if(check==false){
-                    var xhttp1 = new XMLHttpRequest();
-                    xhttp1.onreadystatechange = function(){
-                        if(xhttp1.readyState == 4 && this.status == 200){
-                            var myArr = JSON.parse(this.responseText);
-                            if(myArr.message == 'MACD called'){
-                                xhttp1.abort()
-                            }
-                        }
-                    }
-                    xhttp1.open("POST", "http://localhost:3014/api/macd/script");
-                    xhttp1.setRequestHeader('Accept', 'application/json');
-                    xhttp1.setRequestHeader("Content-Type", "application/json");
-                    xhttp1.send(JSON.stringify({"id_macd":id_macd, "name": name_macd, "start_date": date_macd, "stop_loss": stop_loss, "take_profit": take_profit}));
-                }
-                console.log("Spining")
+        intervals[req.body.id_macd] = setInterval(()=>{
+                var xhttp1 = new XMLHttpRequest();
+                xhttp1.open("POST", "http://localhost:3014/api/macd/script");
+                xhttp1.setRequestHeader('Accept', 'application/json');
+                xhttp1.setRequestHeader("Content-Type", "application/json");
+                xhttp1.send(JSON.stringify({"id_macd":id_macd, "name": name_macd, "start_date": date_macd, "stop_loss": stop_loss, "take_profit": take_profit}));
             },5000)
-        
-
-        res.json({message: 'MACD bot running'});
+        res.json({message: `MACD bot running at ID: ${req.body.id_macd}`});
     }
 };
 

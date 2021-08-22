@@ -47,6 +47,22 @@ def get_last_date(end):
     last_date_with_value = str('20' + year + '-' + month + '-' + day)
     return last_date_with_value
 
+def stoppers_check(id_, end, stop_loss, take_profit, data):
+    last_date = get_last_date(end)
+    curr_close = data.loc[last_date]['Close']
+    balance = get_wallet_balance(id_,"MACD")
+    if float(balance) == 0:
+        quantity = get_wallet_quantity(id_,"MACD")
+        if (float(quantity) * float(curr_close)) >= float(take_profit) or (float(quantity) * float(curr_close)) <= float(stop_loss):
+            print("TERMINATE TRADING BOT")
+        else:
+            print("RUNNING 1")
+    else:
+        if float(balance)>=float(take_profit) or float(balance)<=float(stop_loss):
+            print("TERMINATE TRADING BOT")
+        else:
+            print("RUNNING 2")
+    
 
 def macd_buy_sell(id_,name, end, stop_loss, take_profit, data):
     hodling = hodling_check(id_, "MACD")
@@ -57,10 +73,9 @@ def macd_buy_sell(id_,name, end, stop_loss, take_profit, data):
     curr_close = data.loc[last_date]['Close']
     prev_macd_line = data.loc[date_before_last]['macd']
     prev_signal_line = data.loc[date_before_last]['signal_line']
-    balance = get_wallet_balance(id_,"MACD")
     
-    if str(balance) <= str(stop_loss) or str(balance) >= str(take_profit):
-        print("TERMINATE TRADING BOT")
+    stoppers_check(id_,end,stop_loss, take_profit, data)
+
     if prev_macd_line == prev_signal_line or abs(prev_macd_line - prev_signal_line) < 0.5:
         if curr_macd_line < curr_signal_line:
             if hodling==True:
@@ -102,6 +117,8 @@ def macd_buy_sell(id_,name, end, stop_loss, take_profit, data):
 
 def create_wallet(id_,name, balance, method):
     requests.post('http://localhost:3014/api/createWallet', json={"id":id_,"name":name,"balance":balance,"method":method})
+
+
 
 def get_wallet_balance(id_,method):
     r = requests.get('http://localhost:3014/api/getWallet', json={"id":id_, "method":method})
