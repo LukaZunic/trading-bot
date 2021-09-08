@@ -44,25 +44,45 @@ def get_last_date(end):
     last_date_with_value = str('20' + year + '-' + month + '-' + day)
     return last_date_with_value
 
-def ichimoku_cloud_buy_sell(id_,name, curr_close_price, curr_span_a, curr_span_b, curr_kijun, curr_tenkan):
+def stoppers_check(id_, stop_loss, take_profit, curr_close_price):
+
+    curr_close = curr_close_price
+    balance = get_wallet_balance(id_,"ICHIMOKU CLOUD")
+    if float(balance) == 0:
+        quantity = get_wallet_quantity(id_,"ICHIMOKU CLOUD")
+        if (float(quantity) * float(curr_close)) >= float(take_profit) or (float(quantity) * float(curr_close)) <= float(stop_loss):
+            print("TERMINATE TRADING BOT")
+        else:
+            print("RUNNING 1")
+    else:
+        if float(balance)>=float(take_profit) or float(balance)<=float(stop_loss):
+            print("TERMINATE TRADING BOT")
+        else:
+            print("RUNNING 2")
+
+def ichimoku_cloud_buy_sell(id_,stop_loss, take_profit, name, curr_close_price, curr_span_a, curr_span_b, curr_kijun, curr_tenkan):
     hodling = hodling_check(id_,"ICHIMOKU CLOUD")
+    stoppers_check(id_,stop_loss, take_profit, curr_close_price)
     if curr_close_price > curr_span_a and curr_close_price > curr_span_b:
         if abs(curr_kijun-curr_tenkan) >= 0 and abs(curr_kijun-curr_tenkan) <= 2.5:
-            print("BUUUUY!!!")
-            print('Bought at the price of:',curr_close_price,'$')
-            time = datetime.now()
-            r = requests.post('http://localhost:3014/api/order', json={
-                    "wallet_id": id_,
-                    "timestamp": str(time),
-                    "type":"BUY",
-                    "name": name,
-                    "quantity": str(float(get_wallet_balance(id_,"ICHIMOKU CLOUD"))/curr_close_price),
-                    "price":float(curr_close_price),
-                    "method": "ICHIMOKU CLOUD"
-            })
-            buying_rebalance(id_,curr_close_price, str(float(get_wallet_balance(id_,"ICHIMOKU CLOUD"))/curr_close_price), "ICHIMOKU CLOUD")
-            print(r.json())
-            hodling = True
+            if hodling==False:
+                print("BUUUUY!!!")
+                print('Bought at the price of:',curr_close_price,'$')
+                time = datetime.now()
+                r = requests.post('http://localhost:3014/api/order', json={
+                        "wallet_id": id_,
+                        "timestamp": str(time),
+                        "type":"BUY",
+                        "name": name,
+                        "quantity": str(float(get_wallet_balance(id_,"ICHIMOKU CLOUD"))/curr_close_price),
+                        "price":float(curr_close_price),
+                        "method": "ICHIMOKU CLOUD"
+                })
+                buying_rebalance(id_,curr_close_price, str(float(get_wallet_balance(id_,"ICHIMOKU CLOUD"))/curr_close_price), "ICHIMOKU CLOUD")
+                print(r.json())
+                hodling = True
+            else:
+                print("ALREADY HODLING!")
         else:
             print("Watch for conversion and base line! Might buy soon!")
     else:
@@ -137,6 +157,8 @@ dt_string = time.strftime("%Y-%m-%d")
 id_ = sys.argv[1]
 name = sys.argv[2]
 start = sys.argv[3]
+stop_loss = sys.argv[4]
+take_profit = sys.argv[5]
 end = str(dt_string)  #sell "2020-08-19" #buy "2020-07-07"
 
 data = get_data(name, start, end)
@@ -154,4 +176,4 @@ data['chikou_span'] = data['Close'].shift(-26)
 last_date_with_value = get_last_date(end)
 
 curr_close_price, curr_span_a, curr_span_b, curr_kijun, curr_tenkan = get_latest_data(data,last_date_with_value)
-ichimoku_cloud_buy_sell(id_,name, curr_close_price, curr_span_a, curr_span_b, curr_kijun, curr_tenkan)
+ichimoku_cloud_buy_sell(id_,stop_loss, take_profit,name, curr_close_price, curr_span_a, curr_span_b, curr_kijun, curr_tenkan)

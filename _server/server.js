@@ -38,7 +38,7 @@ app.all('/api/*', function(req, res, next){
     }
     //test
     else if(req.url.substring(0,5) === '/api/'){
-        console.log('TESTNI API');
+        console.log('TRADING BOT API');
         next();
     }
     else if(apiToken.isTokenValid(token)){
