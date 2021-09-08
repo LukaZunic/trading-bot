@@ -6,8 +6,8 @@ var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 var intervals = {};
 var ichimoku = {
     stop: (req, res, next) => {
-        clearInterval(intervals[req.body.id_ichimoku]);
-        res.json({ message: `ICHIMOKU CLOUD ${req.body.id_ichimoku} bot terminated`})
+        clearInterval(intervals[req.body.wallet_id]);
+        res.json({ message: `ICHIMOKU CLOUD ${req.body.wallet_id} bot terminated`})
         console.log('ICHIMOKU CLOUD bot terminated');
     },
     ichimoku: (req, res , next) => {
@@ -30,19 +30,19 @@ var ichimoku = {
         res.json({ message: `ICHIMOKU CLOUD script called at ID: ${req.body.id_ichimoku}`});
     },
     startichimoku: (req, res, next) => {
-        var id_ichimoku=req.body.id_ichimoku;
+        var id_ichimoku=req.body.wallet_id;
         var name_ichimoku=req.body.name;
         var date_ichimoku=req.body.start_date;
         var stop_loss=req.body.stop_loss;
         var take_profit=req.body.take_profit;
-        intervals[req.body.id_ichimoku] = setInterval(()=>{
+        intervals[req.body.wallet_id] = setInterval(()=>{
             var xhttp1 = new XMLHttpRequest();
             xhttp1.open("POST", "http://localhost:3014/api/ichimoku/script");
             xhttp1.setRequestHeader('Accept', 'application/json');
             xhttp1.setRequestHeader("Content-Type", "application/json");
             xhttp1.send(JSON.stringify({"id_ichimoku":id_ichimoku, "name": name_ichimoku, "start_date": date_ichimoku, "stop_loss": stop_loss, "take_profit": take_profit}));
         },5000);
-        res.json({message: `ICHIMOKU CLOUD bot running at ID: ${req.body.id_ichimoku}`})
+        res.json({message: `ICHIMOKU CLOUD bot running at ID: ${req.body.wallet_id}`})
     }
 };
 
