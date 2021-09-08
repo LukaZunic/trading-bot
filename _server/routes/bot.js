@@ -6,13 +6,14 @@ var functions    = require('./functions.js');
 var bots = {
     addBot: (req, res, next) => {
         try{
-            if(req.body.wallet_id && req.body.name && req.body.method){
+            if(req.body.wallet_id && req.body.name && req.body.method && req.body.status){
                 let botss = [
                     req.body.wallet_id,
                     req.body.name,
-                    req.body.method
+                    req.body.method,
+                    req.body.status
                 ]
-                let query = "INSERT INTO `tradingbot`.`running_bots` (`wallet_id`,`name`,`method`) VALUES (?);";
+                let query = "INSERT INTO `tradingbot`.`running_bots` (`wallet_id`,`name`,`method`,`status`) VALUES (?);";
                 let table = [botss];
                 query = mysql.format(query, table);
                 functions.mysql_queryV2(query, function(dataSent){

@@ -42,7 +42,7 @@ export class WalletComponent implements OnInit {
   // tslint:disable-next-line:typedef
   createWallet(){
     this.market.createWallet(this.form.value['wallet_id'],this.form.value['name'], this.form.value['method'], this.form.value['amount']).subscribe();
-    this.market.addBot(this.form.value['wallet_id'],this.form.value['name'], this.form.value['method']).subscribe();
+    this.market.addBot(this.form.value['wallet_id'],this.form.value['name'], this.form.value['method'], 'false').subscribe();
     this.form.patchValue({wallet_id:'',name:'', amount:'', method:''});
   
   }

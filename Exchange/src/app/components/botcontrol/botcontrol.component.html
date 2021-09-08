@@ -16,14 +16,14 @@
     </mat-card-header>
   
     <mat-card-content>
-      <mat-list *ngFor="let bot of bots | keyvalue" style="padding-top:80px;padding-bottom: 70px;">
-        <mat-list-item >
+      <mat-list *ngFor="let bot of bots | keyvalue" style=" padding-bottom: 20px;">
+        <mat-list-item style="height:auto;">
           <div class="container">
-            <div class="row">
+            <div class="row pb-2">
               ID: {{bot.value.wallet_id}}
             </div>
             <div class="row">
-                <form [formGroup]="form">
+                <form [formGroup]="form" *ngIf="bot.value.status == 'false'">
                     <mat-form-field >
                       <mat-label>Take profit ($)</mat-label>
                       <input formControlName="take_profit" matInput>
@@ -35,8 +35,10 @@
                   </form>
             </div>
             <div class="row">
-              <div class="col-6 nopadding"><button class="btn btn-success btn-block" (click)="startBot(bot.value.wallet_id,bot.value.name, bot.value.method)">Start</button></div>
-              <div class="col-6 nopadding"><button class="btn btn-danger btn-block" (click)="stopBot(bot.value.wallet_id, bot.value.method)">Stop</button></div>
+              <div *ngIf="bot.value.status == 'false'" class="col-12 nopadding"><button class="btn btn-success btn-block" (click)="startBot(bot.value.wallet_id,bot.value.name, bot.value.method)">Start</button></div>
+            </div>
+            <div class="row">
+              <div *ngIf="bot.value.status == 'true'" class="col-12 nopadding"><button class="btn btn-danger btn-block" (click)="stopBot(bot.value.wallet_id, bot.value.method)">Stop</button></div>
             </div>
           </div>
         </mat-list-item>

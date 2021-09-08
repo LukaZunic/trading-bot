@@ -40,11 +40,12 @@ export class MarketService {
     );
   }
 
-  addBot(wallet_id:string,name:string,method:string){
+  addBot(wallet_id:string,name:string,method:string, status:string){
     return this.http.post<any>(`http://localhost:3014/api/bot/add`, {
         wallet_id:wallet_id,
         name:name,
-        method:method
+        method:method,
+        status:status
     }).pipe(
       tap(data => console.log('adding new bot', data))
     );

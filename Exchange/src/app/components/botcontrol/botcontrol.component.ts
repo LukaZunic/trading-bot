@@ -14,7 +14,7 @@ export class BotcontrolComponent implements OnInit {
 
   form: FormGroup;
 
-  new = false;
+
 
   constructor(public market: MarketService) {
     this.form = new FormGroup({
@@ -23,12 +23,6 @@ export class BotcontrolComponent implements OnInit {
     });
   }
 
-  change(value:any){
-    //this.form.patchValue({name:value})
-  }
-  changeMethod(value:any){
-    //this.form.patchValue({method:value})
-  }
   startBot(wallet_id,name, method){
     this.market.startBot(wallet_id,name,method,this.form.value['take_profit'], this.form.value['stop_loss']).subscribe();
   }
@@ -41,9 +35,5 @@ export class BotcontrolComponent implements OnInit {
     );
   }
 
-  // tslint:disable-next-line:typedef
-  createWallet(){
-    //this.market.createWallet(this.form.value['name'], this.form.value['method'], this.form.value['amount']).subscribe();
-    //this.form.patchValue({name:'', amount:'', method:''});
-  }
+
 }
