@@ -6,6 +6,7 @@ var ichimoku          = require('./ichimoku.js');
 var macd              = require('./macd.js');
 var rsi               = require('./rsi.js')
 var market            = require('./market.js');
+var bots               = require('./bot.js');
 
 
 /* ORDER */
@@ -17,6 +18,12 @@ router.post('/api/createWallet',        wallet.createWallet);
 router.get('/api/getWallet',            wallet.getWallet);
 router.get('/api/getAllWallet',         wallet.getAllWallet);
 router.post('/api/rebalance',           wallet.rebalance);
+
+/* RUNNING BOTS */
+router.get('/api/bot/getAll',           bots.getAllRunning);
+router.get('/api/bot/getSingle',        bots.getRunning);
+router.post('/api/bot/add',             bots.addBot);
+router.post('/api/bot/remove',          bots.removeBot);
 
 /* ICHIMOKU */
 router.post('/api/ichimoku/script',     ichimoku.ichimoku);
