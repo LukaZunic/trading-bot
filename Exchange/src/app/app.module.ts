@@ -24,6 +24,7 @@ import {MatListModule} from '@angular/material/list';
 import {ReactiveFormsModule} from '@angular/forms';
 import {MatSelectModule} from '@angular/material/select';
 import {MatInputModule} from '@angular/material/input';
+import { BotcontrolComponent } from './components/botcontrol/botcontrol.component';
 
 
 
@@ -37,7 +38,8 @@ import {MatInputModule} from '@angular/material/input';
     DashboardComponent,
     MarketComponent,
     OrdersComponent,
-    GraphComponent
+    GraphComponent,
+    BotcontrolComponent
   ],
   imports: [
     BrowserModule,

@@ -1,0 +1,52 @@
+
+<mat-card *ngIf="bots$ | async as bots" class="scrollable-content fw-bold m-t-s m-l-l m-b-l flex fw-nowrap" style="width: 100%; max-width: 400px; height: 500px;">
+
+    <mat-card-header>
+      <div mat-card-avatar>
+        <mat-icon style="font-size: 36px;">
+          smart_toy
+        </mat-icon>
+      </div>
+      <mat-card-title>
+        Bot Managment
+      </mat-card-title>
+      <mat-card-subtitle>
+        Manage your bots
+      </mat-card-subtitle>
+    </mat-card-header>
+  
+    <mat-card-content>
+      <mat-list *ngFor="let bot of bots | keyvalue" style="padding-top:80px;padding-bottom: 70px;">
+        <mat-list-item >
+          <div class="container">
+            <div class="row">
+              ID: {{bot.value.wallet_id}}
+            </div>
+            <div class="row">
+                <form [formGroup]="form">
+                    <mat-form-field >
+                      <mat-label>Take profit ($)</mat-label>
+                      <input formControlName="take_profit" matInput>
+                    </mat-form-field>
+                    <mat-form-field >
+                      <mat-label>Stop loss ($)</mat-label>
+                      <input formControlName="stop_loss" matInput>
+                    </mat-form-field>
+                  </form>
+            </div>
+            <div class="row">
+              <div class="col-6 nopadding"><button class="btn btn-success btn-block">Start</button></div>
+              <div class="col-6 nopadding"><button class="btn btn-danger btn-block">Stop</button></div>
+            </div>
+          </div>
+        </mat-list-item>
+      </mat-list>
+    </mat-card-content>
+  
+    
+    
+  
+  </mat-card>
+  
+  
+  

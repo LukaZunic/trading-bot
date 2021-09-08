@@ -19,6 +19,7 @@ export class WalletComponent implements OnInit {
 
   constructor(public market: MarketService) {
     this.form = new FormGroup({
+      wallet_id: new FormControl(''),
       amount: new FormControl(''),
       method: new FormControl(''),
       name: new FormControl('')
@@ -40,8 +41,10 @@ export class WalletComponent implements OnInit {
 
   // tslint:disable-next-line:typedef
   createWallet(){
-    this.market.createWallet(this.form.value['name'], this.form.value['method'], this.form.value['amount']).subscribe();
-    this.form.patchValue({name:'', amount:'', method:''});
+    this.market.createWallet(this.form.value['wallet_id'],this.form.value['name'], this.form.value['method'], this.form.value['amount']).subscribe();
+    this.market.addBot(this.form.value['wallet_id']).subscribe();
+    this.form.patchValue({wallet_id:'',name:'', amount:'', method:''});
+  
   }
 
 

@@ -20,7 +20,7 @@
   </button>
 
   <mat-card-content *ngIf="!new else create">
-    <mat-list *ngFor="let wallet of wallets | keyvalue" style="padding-top: 55px;">
+    <mat-list *ngFor="let wallet of wallets | keyvalue">
       <mat-list-item >
         <div class="container">
           <div class="row">
@@ -30,10 +30,6 @@
             <div class="col-4 nopadding">{{wallet.value.name}}</div>
             <div class="col-4 nopadding">{{wallet.value.method}}</div>
             <div class="col-4 nopadding">${{wallet.value.balance}}</div>
-          </div>
-          <div class="row">
-            <div class="col-6 nopadding"><button class="btn btn-success btn-block">Start</button></div>
-            <div class="col-6 nopadding"><button class="btn btn-danger btn-block">Stop</button></div>
           </div>
         </div>
       </mat-list-item>
@@ -56,10 +52,6 @@
             <mat-option value="nkla" (click)="change('NKLA')">NKLA</mat-option>
           </mat-select>
         </mat-form-field>
-        <mat-form-field >
-          <mat-label>Amount ($)</mat-label>
-          <input formControlName="amount" matInput>
-        </mat-form-field>
         <mat-form-field>
           <mat-label>Method</mat-label>
           <mat-select style="padding-top: 10px;">
@@ -68,6 +60,15 @@
             <mat-option value="macd" (click)="changeMethod('MACD')">MACD</mat-option>
           </mat-select>
         </mat-form-field>
+        <mat-form-field >
+          <mat-label>Wallet ID</mat-label>
+          <input formControlName="wallet_id" matInput>
+        </mat-form-field>
+        <mat-form-field >
+          <mat-label>Amount ($)</mat-label>
+          <input formControlName="amount" matInput>
+        </mat-form-field>
+        
       </form>
 
       <button mat-raised-button (click)="createWallet()">New wallet</button>
