@@ -40,14 +40,51 @@ export class MarketService {
     );
   }
 
-  addBot(wallet_id:string){
+  addBot(wallet_id:string,name:string,method:string){
     return this.http.post<any>(`http://localhost:3014/api/bot/add`, {
-        wallet_id:wallet_id
+        wallet_id:wallet_id,
+        name:name,
+        method:method
     }).pipe(
       tap(data => console.log('adding new bot', data))
     );
   }
 
+  startBot(wallet_id:string, name:string, method: string, take_profit:string, stop_loss:string){
+    if(method==="ICHIMOKU CLOUD"){
+      method = "ichimoku";
+    }else if(method==="RSI"){
+      method="rsi";
+    }
+    else{
+      method="macd"
+    }
+    return this.http.post<any>(`http://localhost:3014/api/${method}/start`, {
+        wallet_id:wallet_id,
+        name:name,
+        start_date:"2020-01-05", //date when the first data is fetched
+        take_profit:take_profit,
+        stop_loss:stop_loss
+    }).pipe(
+      tap(data => console.log('adding new bot', data))
+    );
+  }
+
+  stopBot(wallet_id:string, method:string){
+    if(method==="ICHIMOKU CLOUD"){
+      method = "ichimoku";
+    }else if(method==="RSI"){
+      method="rsi";
+    }
+    else{
+      method="macd"
+    }
+    return this.http.post<any>(`http://localhost:3014/api/${method}/stop`, {
+      wallet_id:wallet_id
+  }).pipe(
+    tap(data => console.log('stopping bot', data))
+  );
+  }
 
 
 }

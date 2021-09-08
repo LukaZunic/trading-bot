@@ -10,7 +10,6 @@ import { OrdersComponent } from './components/orders/orders.component';
 import { GraphComponent } from './components/graph/graph.component';
 
 import { HttpClientModule } from '@angular/common/http';
-import { OrderComponent } from './components/order/order.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
@@ -33,7 +32,6 @@ import { BotcontrolComponent } from './components/botcontrol/botcontrol.componen
   declarations: [
     AppComponent,
     WalletComponent,
-    OrderComponent,
     NavbarComponent,
     DashboardComponent,
     MarketComponent,

@@ -29,7 +29,12 @@ export class BotcontrolComponent implements OnInit {
   changeMethod(value:any){
     //this.form.patchValue({method:value})
   }
-
+  startBot(wallet_id,name, method){
+    this.market.startBot(wallet_id,name,method,this.form.value['take_profit'], this.form.value['stop_loss']).subscribe();
+  }
+  stopBot(wallet_id,method){
+    this.market.stopBot(wallet_id,method).subscribe();
+  }
   ngOnInit(): void {
     this.bots$ = this.market.bot$.pipe(
       map(data => data.data)

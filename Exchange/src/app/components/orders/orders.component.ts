@@ -16,7 +16,7 @@ export class OrdersComponent implements OnInit {
 
   ngOnInit(): void {
     this.orders$ = this.market.orderData$.pipe(
-      tap(data => console.log(data.data)),
+      //tap(data => console.log(data.data)),
       map(data => data.data)
     );
   }

@@ -1,5 +1,5 @@
 
-<mat-card *ngIf="bots$ | async as bots" class="scrollable-content fw-bold m-t-s m-l-l m-b-l flex fw-nowrap" style="width: 100%; max-width: 400px; height: 500px;">
+<mat-card *ngIf="bots$ | async as bots" class="scrollable-content fw-bold m-t-s m-l-l m-b-l flex fw-nowrap" style="margin-left: 100px; width: 100%; max-width: 400px; height: 500px;">
 
     <mat-card-header>
       <div mat-card-avatar>
@@ -35,8 +35,8 @@
                   </form>
             </div>
             <div class="row">
-              <div class="col-6 nopadding"><button class="btn btn-success btn-block">Start</button></div>
-              <div class="col-6 nopadding"><button class="btn btn-danger btn-block">Stop</button></div>
+              <div class="col-6 nopadding"><button class="btn btn-success btn-block" (click)="startBot(bot.value.wallet_id,bot.value.name, bot.value.method)">Start</button></div>
+              <div class="col-6 nopadding"><button class="btn btn-danger btn-block" (click)="stopBot(bot.value.wallet_id, bot.value.method)">Stop</button></div>
             </div>
           </div>
         </mat-list-item>
