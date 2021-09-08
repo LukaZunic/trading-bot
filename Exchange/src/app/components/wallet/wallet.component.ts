@@ -19,8 +19,17 @@ export class WalletComponent implements OnInit {
 
   constructor(public market: MarketService) {
     this.form = new FormGroup({
-      currency: new FormControl('')
+      amount: new FormControl(''),
+      method: new FormControl(''),
+      name: new FormControl('')
     });
+  }
+
+  change(value:any){
+    this.form.patchValue({name:value})
+  }
+  changeMethod(value:any){
+    this.form.patchValue({method:value})
   }
 
   ngOnInit(): void {
@@ -31,7 +40,8 @@ export class WalletComponent implements OnInit {
 
   // tslint:disable-next-line:typedef
   createWallet(){
-    this.market.createWallet('BTC-USD', 'MACD', 10000).subscribe();
+    this.market.createWallet(this.form.value['name'], this.form.value['method'], this.form.value['amount']).subscribe();
+    this.form.patchValue({name:'', amount:'', method:''});
   }
 
 

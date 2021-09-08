@@ -28,11 +28,11 @@ export class MarketService {
 
 
   // tslint:disable-next-line:typedef
-  createWallet(crypto: string, method: string, balance: number){
+  createWallet(name: string, method: string, amount: string){
     return this.http.post<any>(`http://localhost:3014/api/createWallet`, {
-        name: crypto,
-        balance,
-        method
+        name: name,
+        balance: amount,
+        method:method
     }).pipe(
       tap(data => console.log('creating new wallet', data))
     );

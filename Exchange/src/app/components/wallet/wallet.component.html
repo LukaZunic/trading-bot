@@ -1,5 +1,5 @@
 
-<mat-card *ngIf="wallets$ | async as wallets" class="scrollable-content fw-bold m-t-s m-l-l m-b-l flex fw-nowrap" style="width: 25%; max-width: 400px; height: 500px;">
+<mat-card *ngIf="wallets$ | async as wallets" class="scrollable-content fw-bold m-t-s m-l-l m-b-l flex fw-nowrap" style="width: 100%; max-width: 400px; height: 500px;">
 
   <mat-card-header>
     <div mat-card-avatar>
@@ -20,22 +20,53 @@
   </button>
 
   <mat-card-content *ngIf="!new else create">
-    <mat-list *ngFor="let wallet of wallets | keyvalue">
-      <mat-list-item>
-        ${{wallet.value.balance}}
-        {{wallet.value.name}}
-        {{wallet.value.method}}<br>
-        ID: {{wallet.value.id}}
+    <mat-list *ngFor="let wallet of wallets | keyvalue" style="padding-top: 55px;">
+      <mat-list-item >
+        <div class="container">
+          <div class="row">
+            ID: {{wallet.value.id}}
+          </div>
+          <div class="row">
+            <div class="col-4 nopadding">{{wallet.value.name}}</div>
+            <div class="col-4 nopadding">{{wallet.value.method}}</div>
+            <div class="col-4 nopadding">${{wallet.value.balance}}</div>
+          </div>
+          <div class="row">
+            <div class="col-6 nopadding"><button class="btn btn-success btn-block">Start</button></div>
+            <div class="col-6 nopadding"><button class="btn btn-danger btn-block">Stop</button></div>
+          </div>
+        </div>
       </mat-list-item>
     </mat-list>
   </mat-card-content>
 
-  <ng-template #create>
+  <ng-template #create style="padding-top: 5px;">
     <mat-card-content>
       <form [formGroup]="form">
+        <mat-form-field style="padding-top: 10px;">
+          <mat-label>Symbol name</mat-label>
+          <mat-select style="padding-top: 10px;">
+            <mat-option value="dogeusd" (click)="change('DOGE-USD')">DOGE-USD</mat-option>
+            <mat-option value="ethusd" (click)="change('ETH-USD')">ETH-USD</mat-option>
+            <mat-option value="adausd" (click)="change('ADA-USD')">ADA-USD</mat-option>
+            <mat-option value="hexusd" (click)="change('HEX-USD')">HEX-USD</mat-option>
+            <mat-option value="kdmn" (click)="change('KDMN')">KDMN</mat-option>
+            <mat-option value="path" (click)="change('PATH')">PATH</mat-option>
+            <mat-option value="nndm" (click)="change('NNDM')">NNDM</mat-option>
+            <mat-option value="nkla" (click)="change('NKLA')">NKLA</mat-option>
+          </mat-select>
+        </mat-form-field>
         <mat-form-field >
-          <mat-label>First name</mat-label>
-          <input formControlName="currency" matInput>
+          <mat-label>Amount ($)</mat-label>
+          <input formControlName="amount" matInput>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>Method</mat-label>
+          <mat-select style="padding-top: 10px;">
+            <mat-option value="ichimoku" (click)="changeMethod('ICHIMOKU CLOUD')">ICHIMOKU CLOUD</mat-option>
+            <mat-option value="rsi" (click)="changeMethod('RSI')">RSI</mat-option>
+            <mat-option value="macd" (click)="changeMethod('MACD')">MACD</mat-option>
+          </mat-select>
         </mat-form-field>
       </form>
 

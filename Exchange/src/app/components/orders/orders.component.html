@@ -1,5 +1,5 @@
 
-<mat-card *ngIf="orders$ | async as orders" class="scrollable-content fw-bold m-a-l m-b-s m-t-m flex fw-nowrap" style="width: 18%; max-width: 400px; height: 290px;">
+<mat-card *ngIf="orders$ | async as orders" class="scrollable-content fw-bold m-a-l m-b-s m-t-m flex fw-nowrap" style="width: 100%; max-width: 400px; height: 500px;">
 
   <mat-card-header>
     <div mat-card-avatar>
@@ -27,8 +27,10 @@
           </ng-template>
         </div>
         {{order.value.timestamp.slice(0,19)}}<br>
-        {{order.value.type}}
-        {{order.value.name}}
+        {{order.value.type}} |
+        {{order.value.name}} |
+        ID: {{order.value.wallet_id}}
+        
       </mat-list-item>
     </mat-list>
   </mat-card-content>
