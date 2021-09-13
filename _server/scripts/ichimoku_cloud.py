@@ -52,6 +52,18 @@ def stoppers_check(id_, stop_loss, take_profit, curr_close_price):
         quantity = get_wallet_quantity(id_,"ICHIMOKU CLOUD")
         if (float(quantity) * float(curr_close)) >= float(take_profit) or (float(quantity) * float(curr_close)) <= float(stop_loss):
             print("TERMINATE TRADING BOT")
+            time = datetime.now()
+            quantity = get_wallet_quantity(id_,"ICHIMOKU CLOUD")
+            r = requests.post('http://localhost:3014/api/order', json={
+                    "wallet_id": id_,
+                    "timestamp": str(time),
+                    "type":"SELL",
+                    "name": name,
+                    "quantity": str(quantity),
+                    "price": float(curr_close_price),
+                    "method": "ICHIMOKU CLOUD"
+            })
+            selling_rebalance(id_,str(float(quantity)*float(curr_close_price)),"ICHIMOKU CLOUD")
         else:
             print("RUNNING 1")
     else:
@@ -64,9 +76,9 @@ def ichimoku_cloud_buy_sell(id_,stop_loss, take_profit, name, curr_close_price, 
     hodling = hodling_check(id_,"ICHIMOKU CLOUD")
     stoppers_check(id_,stop_loss, take_profit, curr_close_price)
     if curr_close_price > curr_span_a and curr_close_price > curr_span_b:
-        if abs(curr_kijun-curr_tenkan) >= 0 and abs(curr_kijun-curr_tenkan) <= 2.5:
+        if curr_tenkan-curr_kijun >= 0 and curr_tenkan-curr_kijun <= 2.5:
             if hodling==False:
-                print("BUUUUY!!!")
+                print("BUY SIGNAL TRIGGERED!")
                 print('Bought at the price of:',curr_close_price,'$')
                 time = datetime.now()
                 r = requests.post('http://localhost:3014/api/order', json={
@@ -88,8 +100,8 @@ def ichimoku_cloud_buy_sell(id_,stop_loss, take_profit, name, curr_close_price, 
     else:
         if hodling==True:
             if curr_close_price < curr_span_a and curr_close_price < curr_span_b:
-                if abs(curr_kijun-curr_tenkan) >= 0 and abs(curr_kijun-curr_tenkan) <= 2.5:
-                    print("SEEEELLL!!!!")
+                if curr_kijun-curr_tenkan >= 0 and curr_kijun-curr_tenkan <= 2.5:
+                    print("SELL SIGNAL TRIGGERED!")
                     print('Sold at the price of:',curr_close_price,'$')
                     time = datetime.now()
                     quantity = get_wallet_quantity(id_,"ICHIMOKU CLOUD")
@@ -160,6 +172,13 @@ start = sys.argv[3]
 stop_loss = sys.argv[4]
 take_profit = sys.argv[5]
 end = str(dt_string)  #sell "2020-08-19" #buy "2020-07-07"
+
+#id_= "testing"
+#name = "ADA-USD"
+#start = "2020-01-01"
+#stop_loss = 40000
+#take_profit = 100000
+#end = "2021-06-11" #"2020-06-01"
 
 data = get_data(name, start, end)
 index = pd.date_range(end, periods=25, freq='D')
