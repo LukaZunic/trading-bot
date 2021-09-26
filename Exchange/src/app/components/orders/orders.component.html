@@ -1,0 +1,38 @@
+
+<mat-card *ngIf="orders$ | async as orders" class="scrollable-content fw-bold m-a-l m-b-s m-t-m flex fw-nowrap" style="width: 100%; max-width: 400px; height: 500px;">
+
+  <mat-card-header>
+    <div mat-card-avatar>
+      <mat-icon style="font-size: 36px;">
+        fact_check
+      </mat-icon>
+    </div>
+    <mat-card-title>
+      Orders
+    </mat-card-title>
+    <mat-card-subtitle>
+      Select order for more details
+    </mat-card-subtitle>
+  </mat-card-header>
+
+  <mat-card-content>
+    <mat-list *ngFor="let order of orders | keyvalue">
+      <mat-list-item>
+        <div class="m-r-s">
+          <mat-icon mat-list-icon *ngIf="order.value.type=='BUY' else sell">call_missed_outgoing</mat-icon>
+          <ng-template #sell>
+            <mat-icon mat-list-icon>
+              call_missed_ingoing
+            </mat-icon>
+          </ng-template>
+        </div>
+        {{order.value.timestamp.slice(0,19)}}<br>
+        {{order.value.type}} |
+        {{order.value.name}} |
+        ID: {{order.value.wallet_id}}
+        
+      </mat-list-item>
+    </mat-list>
+  </mat-card-content>
+
+</mat-card>

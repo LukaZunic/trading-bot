@@ -2,3 +2,7 @@ python-binance
 yfinance
 plotly
 requests
+sys
+numpy
+pandas
+datetime
