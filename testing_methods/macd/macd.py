@@ -3,9 +3,9 @@ import pandas as pd
 import yfinance as yf
 import functions as func
 
-name = "NKLA"
-start = "2020-01-01"
-end = "2020-05-08" #date of buy
+name = "ETH-USD"
+start = "2017-11-01"
+end = "2018-04-01" #date of buy
 #end = "2020-06-27" #date of sell
 
 data = func.get_data(name, start, end)
